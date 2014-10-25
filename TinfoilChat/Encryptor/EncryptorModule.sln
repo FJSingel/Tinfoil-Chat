@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Web
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EncryptorModule", "Encryptor\EncryptorModule.csproj", "{CA1B7887-1D86-4EA8-8A7A-7D2E7C08ED9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTRLib", "..\OTRLib\OTRLib\OTRLib.csproj", "{4D99CE35-7D85-4867-B953-C66D1F4EC67C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CA1B7887-1D86-4EA8-8A7A-7D2E7C08ED9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA1B7887-1D86-4EA8-8A7A-7D2E7C08ED9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA1B7887-1D86-4EA8-8A7A-7D2E7C08ED9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA1B7887-1D86-4EA8-8A7A-7D2E7C08ED9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D99CE35-7D85-4867-B953-C66D1F4EC67C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D99CE35-7D85-4867-B953-C66D1F4EC67C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D99CE35-7D85-4867-B953-C66D1F4EC67C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D99CE35-7D85-4867-B953-C66D1F4EC67C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
