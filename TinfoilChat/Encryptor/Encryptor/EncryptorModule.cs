@@ -25,8 +25,16 @@ namespace EncryptorModule
         OTRSessionManager AliceSessionManager = null;
         OTRSessionManager BobSessionManager = null;
 
-        String aliceMSG = string.Empty;
-        String bobMSG = string.Empty;
+        const int NUMOFMSGS = 3;
+        String[] aliceMSGArray = new String[NUMOFMSGS];
+        String[] bobMSGArray = new String[NUMOFMSGS];
+
+        //Keeps track of which messages have already been sent
+        int aliceConvPos = 0;
+        int bobConvPos = 0;
+
+        //String aliceMSG = string.Empty;
+        //String bobMSG = string.Empty;
 
         internal void RunOTRDemo()
         {
@@ -38,10 +46,13 @@ namespace EncryptorModule
             BobsFriendID = AliceID;
 
             //Let user designate some text to send
-            Console.WriteLine("Alice's input:");
-            String aliceMSG = Console.ReadLine();
-            Console.WriteLine("Bob's input:");
-            String bobMSG = Console.ReadLine();
+            for (int x = 0; x < NUMOFMSGS; x++)
+            {
+                Console.WriteLine("Alice's input:");
+                aliceMSGArray[x] = Console.ReadLine();
+                Console.WriteLine("Bob's input:");
+                bobMSGArray[x] = Console.ReadLine();
+            }
 
             //Open Sessions for each user. IDs should be UNIQUE (Hashes?)
             AliceSessionManager = new OTRSessionManager(AliceID);
@@ -107,9 +118,13 @@ namespace EncryptorModule
                 case OTR_EVENT.MESSAGE:
 
                     Console.WriteLine("{0}: {1} \n", e.GetSessionID(), e.GetMessage());
-                    AliceSessionManager.EncryptMessage(AlicesFriendID, aliceMSG);
+                    if (aliceConvPos < aliceMSGArray.Length)
+                    {
+                        aliceConvPos++;
+                        AliceSessionManager.EncryptMessage(AlicesFriendID, aliceMSGArray[aliceConvPos-1]);
+                    }
                     break;
-                case OTR_EVENT.SEND:
+                case OTR_EVENT.SEND:    
                     SendDataOnNetwork(AliceID, e.GetMessage());
                     break;
                 case OTR_EVENT.ERROR:
@@ -118,7 +133,8 @@ namespace EncryptorModule
                     break;
                 case OTR_EVENT.READY:
                     Console.WriteLine("Alice: Encrypted OTR session with {0} established \n", e.GetSessionID());
-                    AliceSessionManager.EncryptMessage(AlicesFriendID, aliceMSG);
+                    aliceConvPos++;
+                    AliceSessionManager.EncryptMessage(AlicesFriendID, aliceMSGArray[aliceConvPos-1]);
                     break;
                 case OTR_EVENT.DEBUG:
                     Console.WriteLine("Alice: " + e.GetMessage() + "\n");
@@ -142,7 +158,11 @@ namespace EncryptorModule
                 case OTR_EVENT.MESSAGE:
 
                     Console.WriteLine("{0}: {1} \n", e.GetSessionID(), e.GetMessage());
-                    AliceSessionManager.EncryptMessage(BobsFriendID, bobMSG);
+                    if (bobConvPos < bobMSGArray.Length)
+                    {
+                        bobConvPos++;
+                        BobSessionManager.EncryptMessage(BobsFriendID, bobMSGArray[bobConvPos-1]);
+                    }
                     break;
                 case OTR_EVENT.SEND:
                     SendDataOnNetwork(BobID, e.GetMessage());
@@ -153,7 +173,8 @@ namespace EncryptorModule
                     break;
                 case OTR_EVENT.READY:
                     Console.WriteLine("Bob: Encrypted OTR session with {0} established \n", e.GetSessionID());
-                    BobSessionManager.EncryptMessage(BobsFriendID, bobMSG);
+                    bobConvPos++;
+                    BobSessionManager.EncryptMessage(BobsFriendID, bobMSGArray[bobConvPos-1]);
                     break;
                 case OTR_EVENT.DEBUG:
                     Console.WriteLine("Bob: " + e.GetMessage() + "\n");
@@ -173,13 +194,13 @@ namespace EncryptorModule
         {
             if (my_unique_id == AliceID)
             {
+                //Console.WriteLine("Sending to Bob(" + BobSessionManager.GetMyBuddyFingerPrint(BobID) + "): ");
                 BobSessionManager.ProcessOTRMessage(BobsFriendID, otr_data);
-                Console.WriteLine("Sending to Bob(" + BobSessionManager.GetMyBuddyFingerPrint(BobID) + "): ");
             }
             else if (my_unique_id == BobID)
             {
+                //Console.WriteLine("Sending to Alice(" + AliceSessionManager.GetMyBuddyFingerPrint(AliceID) + "): ");
                 AliceSessionManager.ProcessOTRMessage(AlicesFriendID, otr_data);
-                Console.WriteLine("Sending to Alice(" + AliceSessionManager.GetMyBuddyFingerPrint(AliceID) + "): ");
             }
         }
     }

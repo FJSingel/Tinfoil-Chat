@@ -229,7 +229,7 @@ namespace OTR.Managers
 
             byte[] _message_data = FormatMessage(message_byte_array,is_extra_key_request);
 
-            DebugPrint("Sending Data Message: " + _message_data.ToString());
+            DebugPrint("Sending Data Message: " + System.Text.Encoding.Default.GetString(_message_data));
 
             SendOTRMessage(_message_data);
 
