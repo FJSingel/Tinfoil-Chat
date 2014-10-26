@@ -47,8 +47,36 @@ namespace EncryptorModule
             AliceSessionManager = new OTRSessionManager(AliceID);
             BobSessionManager = new OTRSessionManager(BobID);
 
+            /*
+             //If Alice and Bob want to use their DSA keys
+             AliceSessionManager.CreateOTRSession(AlicesFriendID, AliceKeyObject);
+             BobSessionManager.CreateOTRSession(BobsFriendID, BobKeyObject);
+
+             //If you want to run in debug mode
+             AliceSessionManager.CreateOTRSession(AlicesFriendID, true);
+             BobSessionManager.CreateOTRSession(BobsFriendID, true);
+             
+             //If you want to run in debug mode
+             AliceSessionManager.CreateOTRSession(AlicesFriendID, 100);
+             BobSessionManager.CreateOTRSession(BobsFriendID, 100);
+             */
+
 
             AliceSessionManager.OnOTREvent += new OTREventHandler(OnAliceOTRManagerEventHandler);
+            BobSessionManager.OnOTREvent += new OTREventHandler(OnBobOTRManagerEventHandler);
+
+
+            //If they don't have DSA Keys, make some random ones.
+            AliceSessionManager.CreateOTRSession(AlicesFriendID, true);
+            BobSessionManager.CreateOTRSession(BobsFriendID, true);
+
+            /*
+             Alice requests an OTR session with Bob  using OTR version 2
+             To use version 3 set OTRSessionManager.GetSupportedOTRVersionList()[1]
+             or OTRSessionManager.GetSupportedOTRVersionList()[2]
+             */
+
+            AliceSessionManager.RequestOTRSession(AlicesFriendID, OTRSessionManager.GetSupportedOTRVersionList()[0]);
         }
 
         //Testing method
@@ -105,13 +133,54 @@ namespace EncryptorModule
                     break;
             }
         }
+
+        private void OnBobOTRManagerEventHandler(object source, OTREventArgs e)
+        {
+
+            switch (e.GetOTREvent())
+            {
+                case OTR_EVENT.MESSAGE:
+
+                    Console.WriteLine("{0}: {1} \n", e.GetSessionID(), e.GetMessage());
+                    AliceSessionManager.EncryptMessage(BobsFriendID, bobMSG);
+                    break;
+                case OTR_EVENT.SEND:
+                    SendDataOnNetwork(BobID, e.GetMessage());
+                    break;
+                case OTR_EVENT.ERROR:
+                    Console.WriteLine("Bob: OTR Error: {0} \n", e.GetErrorMessage());
+                    Console.WriteLine("Bob: OTR Error Verbose: {0} \n", e.GetErrorVerbose());
+                    break;
+                case OTR_EVENT.READY:
+                    Console.WriteLine("Bob: Encrypted OTR session with {0} established \n", e.GetSessionID());
+                    BobSessionManager.EncryptMessage(BobsFriendID, bobMSG);
+                    break;
+                case OTR_EVENT.DEBUG:
+                    Console.WriteLine("Bob: " + e.GetMessage() + "\n");
+                    break;
+                case OTR_EVENT.EXTRA_KEY_REQUEST:
+                    break;
+                case OTR_EVENT.SMP_MESSAGE:
+                    Console.WriteLine("Bob: " + e.GetMessage() + "\n");
+                    break;
+                case OTR_EVENT.CLOSED:
+                    Console.WriteLine("Bob: Encrypted OTR session with {0} closed \n", e.GetSessionID());
+                    break;
+            }
+        }
+
         private void SendDataOnNetwork(string my_unique_id, string otr_data)
         {
             if (my_unique_id == AliceID)
+            {
                 BobSessionManager.ProcessOTRMessage(BobsFriendID, otr_data);
+                Console.WriteLine("Sending to Bob(" + BobSessionManager.GetMyBuddyFingerPrint(BobID) + "): ");
+            }
             else if (my_unique_id == BobID)
+            {
                 AliceSessionManager.ProcessOTRMessage(AlicesFriendID, otr_data);
-
+                Console.WriteLine("Sending to Alice(" + AliceSessionManager.GetMyBuddyFingerPrint(AliceID) + "): ");
+            }
         }
     }
 }
