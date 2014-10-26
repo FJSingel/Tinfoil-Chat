@@ -13,21 +13,42 @@ namespace EncryptorModule
         DSAKeyParams AliceKeyObject = null;
         DSAKeyParams BobKeyObject = null;
 
-        //Should probably be set to public key fingerprints
+        //Should probably be set to public key fingerprints. Should be UNIQUE
         String AliceID = "alice";
         String BobID = "bob";
 
-        internal void RunOTRTest()
+        //IDs of who they attempt to talk with
+        String AlicesFriendID = String.Empty;
+        String BobsFriendID = String.Empty;
+
+        //The OTR Sessions
+        OTRSessionManager AliceSessionManager = null;
+        OTRSessionManager BobSessionManager = null;
+
+        String aliceMSG = string.Empty;
+        String bobMSG = string.Empty;
+
+        internal void RunOTRDemo()
         {
             //Negotiate Keys
             SetPublicKeys();
 
+            //Set friend's IDs
+            AlicesFriendID = BobID;
+            BobsFriendID = AliceID;
+
+            //Let user designate some text to send
             Console.WriteLine("Alice's input:");
             String aliceMSG = Console.ReadLine();
             Console.WriteLine("Bob's input:");
             String bobMSG = Console.ReadLine();
 
-            
+            //Open Sessions for each user. IDs should be UNIQUE (Hashes?)
+            AliceSessionManager = new OTRSessionManager(AliceID);
+            BobSessionManager = new OTRSessionManager(BobID);
+
+
+            AliceSessionManager.OnOTREvent += new OTREventHandler(OnAliceOTRManagerEventHandler);
         }
 
         //Testing method
@@ -48,6 +69,49 @@ namespace EncryptorModule
 
             AliceKeyObject = new DSAKeyParams(AliceP, AliceQ, AliceG, AliceX);
             BobKeyObject = new DSAKeyParams(BobP, BobQ, BobG, BobX);
+        }
+
+        private void OnAliceOTRManagerEventHandler(object source, OTREventArgs e)
+        {
+
+            switch (e.GetOTREvent())
+            {
+                case OTR_EVENT.MESSAGE:
+
+                    Console.WriteLine("{0}: {1} \n", e.GetSessionID(), e.GetMessage());
+                    AliceSessionManager.EncryptMessage(AlicesFriendID, aliceMSG);
+                    break;
+                case OTR_EVENT.SEND:
+                    SendDataOnNetwork(AliceID, e.GetMessage());
+                    break;
+                case OTR_EVENT.ERROR:
+                    Console.WriteLine("Alice: OTR Error: {0} \n", e.GetErrorMessage());
+                    Console.WriteLine("Alice: OTR Error Verbose: {0} \n", e.GetErrorVerbose());
+                    break;
+                case OTR_EVENT.READY:
+                    Console.WriteLine("Alice: Encrypted OTR session with {0} established \n", e.GetSessionID());
+                    AliceSessionManager.EncryptMessage(AlicesFriendID, aliceMSG);
+                    break;
+                case OTR_EVENT.DEBUG:
+                    Console.WriteLine("Alice: " + e.GetMessage() + "\n");
+                    break;
+                case OTR_EVENT.EXTRA_KEY_REQUEST:
+                    break;
+                case OTR_EVENT.SMP_MESSAGE:
+                    Console.WriteLine("Alice: " + e.GetMessage() + "\n");
+                    break;
+                case OTR_EVENT.CLOSED:
+                    Console.WriteLine("Alice: Encrypted OTR session with {0} closed \n", e.GetSessionID());
+                    break;
+            }
+        }
+        private void SendDataOnNetwork(string my_unique_id, string otr_data)
+        {
+            if (my_unique_id == AliceID)
+                BobSessionManager.ProcessOTRMessage(BobsFriendID, otr_data);
+            else if (my_unique_id == BobID)
+                AliceSessionManager.ProcessOTRMessage(AlicesFriendID, otr_data);
+
         }
     }
 }

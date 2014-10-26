@@ -17,7 +17,7 @@ namespace EncryptorModule
           
             Encryptor _otr_tester = new Encryptor();
 
-            _otr_tester.RunOTRTest();
+            _otr_tester.RunOTRDemo();
 
             Console.ReadLine();
         }
