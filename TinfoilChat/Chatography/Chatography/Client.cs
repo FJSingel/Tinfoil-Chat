@@ -13,12 +13,15 @@ namespace Chatography
     {
         List<TcpClient> onlineClients;
         NetworkStream stream;
+        int portnum;
 
         static bool isOnline;
 
-        public Client()
+        public Client(int port)
         {
+            onlineClients = new List<TcpClient>();
             isOnline = true;
+            portnum = port;
         }
 
         public void initialize()
@@ -31,12 +34,12 @@ namespace Chatography
 
         public void waitForCommand()
         {
+            string commands = ">> Commands are:\n>>  /find\t-Find user at specified IP address and Port Number.\n" +
+                                                ">>  /exit\t-To go offline and exit.\n" +
+                                                ">>  /help\tdisplay commands.";
+            Console.WriteLine(commands);
             while (isOnline)
             {
-                string commands = ">> Commands are:\n>>  /find\t-Find user at specified IP address and Port Number.\n" +
-                                                    ">>  /exit\t-To go offline and exit.\n" + 
-                                                    ">>  /help\tdisplay commands.";
-                Console.WriteLine(commands);
                 string input = Console.ReadLine();
                 if (input[0] == '/')
                 {
@@ -45,9 +48,6 @@ namespace Chatography
                     {
                         case "find":
                             findUser();
-                            break;
-                        case "exit":
-                            isOnline = false;
                             break;
                         case "help":
                             Console.WriteLine(commands);
@@ -66,24 +66,20 @@ namespace Chatography
                     broadcast(input);
                 }
             }
-
-            Console.WriteLine("Exiting");
         }
 
         private void findUser()
         {
             string ip = "0.0.0.0";
-            int port = 420;
+            int port = portnum;
             bool failed = true;
             while (failed)
             {
                 try
                 {
                     Console.WriteLine("Enter IP Address");
-                    IPAddress IPADDRESS;
-                    String line = Console.ReadLine();
-                    if (IPAddress.TryParse(line, out IPADDRESS))
-                        ip = line;
+                    ip = Console.ReadLine();
+                    IPAddress.Parse(ip);
                     failed = false;
                 }
                 catch (Exception ex)
@@ -105,13 +101,20 @@ namespace Chatography
                     Console.WriteLine(">> " + ex.ToString());
                 }
             }
-            TcpClient nextClient = new TcpClient(ip, port);
-            addClient(nextClient);
+            try
+            {
+                TcpClient nextClient = new TcpClient(ip, port);
+                addClient(nextClient);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(">> " + ex.ToString());
+            }
         }
 
         private void waitForConnection()
         {
-            TcpListener serverSocket = new TcpListener(420);
+            TcpListener serverSocket = new TcpListener(portnum);
 
             serverSocket.Start();
 
@@ -125,7 +128,7 @@ namespace Chatography
         private void addClient(TcpClient client)
         {
             string clientNo = Convert.ToString(onlineClients.Count);
-            Console.WriteLine(" >> " + "Client-" + clientNo + " online!");
+            Console.WriteLine(">> " + "Client-" + clientNo + " online!");
             onlineClients.Add(client);
 
             Thread cThread = new Thread(() => clientListener(client,clientNo));
@@ -135,43 +138,43 @@ namespace Chatography
         private void clientListener(TcpClient clSocket, string clNo)
         {
             string dataFromClient = null;
-            byte[] bytesFrom = new byte[10025];
-            NetworkStream networkStream;
+            byte[] bytesFrom = new byte[clSocket.ReceiveBufferSize];
 
             while ((true))
             {
                 try
                 {
-                    networkStream = clSocket.GetStream();
+                    NetworkStream networkStream = clSocket.GetStream();
                     networkStream.Read(bytesFrom, 0, clSocket.ReceiveBufferSize);
-                    dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
-                    dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
+                    dataFromClient = Encoding.ASCII.GetString(bytesFrom);
+                    dataFromClient = dataFromClient.Substring(0,dataFromClient.IndexOf('$'));
                     Console.WriteLine(" Client-" + clNo + ":" + dataFromClient);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(" >> " + ex.ToString());
+
                 }
             }
         }
 
         private void broadcast(string msg)
         {
-            byte[] bytesToEveryone = new byte[10025];
-            NetworkStream networkStream;
-
+            byte[] bytesToSend = new byte[10025];
+            bytesToSend = Encoding.ASCII.GetBytes(msg + '$');
+            int bytesOfmsg = Encoding.ASCII.GetByteCount(msg + '$');
+            
             foreach (TcpClient client in onlineClients)
             {
-                networkStream = client.GetStream();
-                bytesToEveryone = System.Text.Encoding.ASCII.GetBytes(msg);
-                int bytesOfmsg = System.Text.Encoding.ASCII.GetByteCount(msg);
-                networkStream.Write(bytesToEveryone, 0, bytesOfmsg);
+                NetworkStream networkStream = client.GetStream();
+                networkStream.Write(bytesToSend, 0, bytesOfmsg);
+                networkStream.Flush();
             }
         }
 
         public static void Main(string[] args)
         {
-            Client client = new Client();
+            int port = Int32.Parse(Console.ReadLine());
+            Client client = new Client(port);
             client.initialize();
         }
     }
