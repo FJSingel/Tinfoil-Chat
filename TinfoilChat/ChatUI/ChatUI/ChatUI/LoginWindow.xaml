@@ -1,0 +1,25 @@
+﻿<Window x:Class="ChatUI.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Tin Foil Chat" Height="400" Width="600" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="50*"/>
+        </Grid.ColumnDefinitions>
+        <Button Content="Login" HorizontalAlignment="Left" Margin="41,306,0,0" VerticalAlignment="Top" Width="118" Grid.Column="1" Height="26" Grid.ColumnSpan="2"/>
+        <Button Content="New Account" HorizontalAlignment="Left" Margin="10,308,0,0" VerticalAlignment="Top" Width="118" Grid.Column="4" Height="24" Grid.ColumnSpan="2"/>
+        <TextBlock HorizontalAlignment="Left" Margin="0,66,0,0" TextWrapping="Wrap" Text="Tin Foil Chat" VerticalAlignment="Top" Width='250' FontFamily="Segoe UI Black" FontSize="36" RenderTransformOrigin="0.5,0.5" TextAlignment="Center" Grid.ColumnSpan="3" Grid.Column="2" Height="48"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="4,185,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="161" Grid.Column="3" Grid.ColumnSpan="2"/>
+        <PasswordBox HorizontalAlignment="Left" Height="23" Margin="4,227,0,0" VerticalAlignment="Top" Width="161" Grid.Column="3" Grid.ColumnSpan="2"/>
+        <TextBlock Grid.Column="2" HorizontalAlignment="Left" Height="23" Margin="10,185,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="65" Text="Username"/>
+        <TextBlock Grid.Column="2" HorizontalAlignment="Left" Height="23" Margin="10,227,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="65" Text="Password"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="4,140,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="161" Grid.Column="3" Grid.ColumnSpan="2"/>
+        <TextBlock Grid.Column="2" HorizontalAlignment="Left" Height="23" Margin="10,140,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="65" Text="User File"/>
+    </Grid>
+</Window>

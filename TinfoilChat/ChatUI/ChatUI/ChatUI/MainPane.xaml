@@ -1,0 +1,17 @@
+﻿<Window x:Class="ChatUI.MainPane"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Window1" Height="300" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        <Button Content="Chat_Window" Height="Auto" Width="100" Click="launch_chat" Grid.Row="1" />
+        <Button Content="Login" Height="Auto" Width="100" Click="launch_login" Grid.Row="3" />
+            
+    </Grid>
+</Window>
