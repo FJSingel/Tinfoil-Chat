@@ -35,5 +35,11 @@ namespace ChatUI
             LoginWindow log = new LoginWindow();
             log.Show();
         }
+
+        public void launch_about(object sender, RoutedEventArgs args)
+        {
+            About about = new About();
+            about.Show();
+        }
     }
 }

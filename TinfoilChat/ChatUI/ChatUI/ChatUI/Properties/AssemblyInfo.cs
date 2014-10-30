@@ -8,10 +8,10 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Tin Foil Chat")]
-[assembly: AssemblyDescription("A Secure Distributed Peer-to-Peer chat client")]
+[assembly: AssemblyDescription("A Secure Distributed Peer-to-Peer chat client\n\n\nDeveloped by James Fitzpatrick, Thomas Liao, Frank Singel, and Devyn Spillane.\n\n\nBe advised, they are always watching.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("FLSS")]
-[assembly: AssemblyProduct("ChatUI")]
+[assembly: AssemblyProduct("Tin Foil Chat")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

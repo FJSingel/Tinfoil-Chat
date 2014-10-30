@@ -4,14 +4,16 @@
         Title="ChatWindow" Height="300" Width="300">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="35*" />
-            <RowDefinition Height="35" />
+            <RowDefinition Height="80*" />
+            <RowDefinition Height="15*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="200*" />
+            <ColumnDefinition Width="100*" />
         </Grid.ColumnDefinitions>
         <TextBox Height="Auto" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="textBoxChatPane" VerticalAlignment="Stretch" Width="Auto" Grid.Row="0" />
-        <TextBox Height="23" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="textBoxEntryField" VerticalAlignment="Stretch" Width="Auto" Grid.Row="1" KeyDown="textBoxEntryField_KeyDown" />
+        <TextBox Height="Auto" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="textBoxEntryField" VerticalAlignment="Stretch" Width="Auto" Grid.Row="1" Grid.Column="0" KeyDown="textBoxEntryField_KeyDown" />
+        <TextBox Height="Auto" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="UsersPane" VerticalAlignment="Stretch" Width="Auto" Grid.Row="0" Grid.Column="1" />
+        <Button Height="Auto" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="sendBtn" VerticalAlignment="Stretch" Width="Auto" Grid.Row="1" Grid.Column="1" Content="Send" />
     </Grid>
 </Window>
