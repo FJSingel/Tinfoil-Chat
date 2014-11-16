@@ -192,6 +192,7 @@ namespace EncryptorModule
 
         private void SendDataOnNetwork(string my_unique_id, string otr_data)
         {
+            //This needs to be replaced with actual network code. 
             if (my_unique_id == AliceID)
             {
                 //Console.WriteLine("Sending to Bob(" + BobSessionManager.GetMyBuddyFingerPrint(BobID) + "): ");
