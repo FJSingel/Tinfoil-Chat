@@ -26,80 +26,18 @@ namespace Chatography
 
         public void initialize()
         {
-            Thread comThread = new Thread(waitForCommand);
-            comThread.Start();
-
             waitForConnection();
         }
 
-        public void waitForCommand()
+        private void findUser(string ip, int port)
         {
-            string commands = ">> Commands are:\n>>  /find\t-Find user at specified IP address and Port Number.\n" +
-                                                ">>  /exit\t-To go offline and exit.\n" +
-                                                ">>  /help\tdisplay commands.";
-            Console.WriteLine(commands);
-            while (isOnline)
+            try
             {
-                string input = Console.ReadLine();
-                if (input[0] == '/')
-                {
-                    string command = input.Substring(1);
-                    switch (command)
-                    {
-                        case "find":
-                            findUser();
-                            break;
-                        case "help":
-                            Console.WriteLine(commands);
-                            break;
-                        default:
-                            Console.WriteLine(">> Unrecognized Command. Type 'help' for a list of commands.");
-                            break;
-                    }
-                }
-                else if (input[0] == '@')
-                {
-
-                }
-                else
-                {
-                    broadcast(input);
-                }
+                IPAddress.Parse(ip);
             }
-        }
-
-        private void findUser()
-        {
-            string ip = "0.0.0.0";
-            int port = portnum;
-            bool failed = true;
-            while (failed)
+            catch (Exception ex)
             {
-                try
-                {
-                    Console.WriteLine("Enter IP Address");
-                    ip = Console.ReadLine();
-                    IPAddress.Parse(ip);
-                    failed = false;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(">> " + ex.ToString());
-                }
-            }
-            failed = true;
-            while (failed)
-            {
-                try
-                {
-                    Console.WriteLine("Enter port number");
-                    port = Int32.Parse(Console.ReadLine());
-                    failed = false;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(">> " + ex.ToString());
-                }
+                Console.WriteLine(">> " + ex.ToString());
             }
             try
             {
@@ -128,7 +66,6 @@ namespace Chatography
         private void addClient(TcpClient client)
         {
             string clientNo = Convert.ToString(onlineClients.Count);
-            Console.WriteLine(">> " + "Client-" + clientNo + " online!");
             onlineClients.Add(client);
 
             Thread cThread = new Thread(() => clientListener(client,clientNo));
@@ -174,6 +111,7 @@ namespace Chatography
         public static void Main(string[] args)
         {
             int port = Int32.Parse(Console.ReadLine());
+
             Client client = new Client(port);
             client.initialize();
         }
