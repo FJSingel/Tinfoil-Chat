@@ -45,6 +45,9 @@ namespace Chatography
             connection.Start();
         }
 
+        /// <summary>
+        /// Is the thread listening on the default or otherwise specified socket for connections
+        /// </summary>
         private void waitForConnection()
         {
             TcpListener serverSocket = new TcpListener(portnum);
@@ -58,6 +61,11 @@ namespace Chatography
             }
         }
 
+        /// <summary>
+        /// Attempts to connect to a user at specified ip address and port number
+        /// </summary>
+        /// <param name="ip">The IP address of the user</param>
+        /// <param name="port">The port number the user's client is using</param>
         public void findUser(string ip, int port)
         {
             try
@@ -88,10 +96,10 @@ namespace Chatography
         }
 
         /// <summary>
-        /// Listens to the network stream from specified socket and receives data
+        /// Listens to the network stream from specified socket and writes data to output stream
         /// </summary>
-        /// <param name="clSocket"></param>
-        /// <param name="clNo"></param>
+        /// <param name="clSocket">Socket of Client</param>
+        /// <param name="clNo">Client number in online list</param>
         private void clientListener(TcpClient clSocket, int clNo)
         {
             NetworkStream networkStream;
@@ -117,10 +125,10 @@ namespace Chatography
         }
 
         /// <summary>
-        /// 
+        /// Writes message to network stream of specified client's socket
         /// </summary>
-        /// <param name="clNo"></param>
-        /// <param name="msg"></param>
+        /// <param name="clNo">Client number in online list</param>
+        /// <param name="msg">Message to be sent</param>
         private void message(int clNo, string msg)
         {
             byte[] bytesToSend = new byte[10025];
@@ -134,9 +142,9 @@ namespace Chatography
         }
 
         /// <summary>
-        /// 
+        /// Writes message to every connected clients' socket's network stream
         /// </summary>
-        /// <param name="msg"></param>
+        /// <param name="msg">Message to be sent</param>
         public void broadcast(string msg)
         {
             byte[] bytesToSend = new byte[10025];
