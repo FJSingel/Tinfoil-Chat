@@ -173,7 +173,7 @@ namespace Chatography
             {
                 output.Position = position;
                 string OUT = outputReader.ReadToEnd();
-                Console.Write(OUT);
+                Console.Write(OUT); //replace this line with function to output to UI
                 position += OUT.Length;
             }
         }
