@@ -20,25 +20,23 @@ namespace Chatography
         List<TcpClient> onlineClients;
         List<Thread> connections;
         TextWriter cout;
-        TextWriter cerr;
 
-        public Client(TextWriter output, TextWriter error)
+        public Client(TextWriter output)
         {
-            initialize(output, error);
+            initialize(output);
         }
 
-        public Client(TextWriter output, TextWriter error, int port)
+        public Client(TextWriter output, int port)
         {
             portnum = port;
-            initialize(output, error);
+            initialize(output);
         }
 
-        private void initialize(TextWriter output, TextWriter error)
+        private void initialize(TextWriter output)
         {
             isOnline = true;
             onlineClients = new List<TcpClient>();
             cout = output;
-            cerr = error;
 
             connections = new List<Thread>();
             connection = new Thread(() => waitForConnection());
@@ -66,7 +64,7 @@ namespace Chatography
         /// </summary>
         /// <param name="ip">The IP address of the user</param>
         /// <param name="port">The port number the user's client is using</param>
-        public void findUser(string ip, int port)
+        public bool findUser(string ip, int port)
         {
             try
             {
@@ -74,7 +72,7 @@ namespace Chatography
             }
             catch (Exception ex)
             {
-                cerr.WriteLine(">> " + ex.ToString());
+                return false;
             }
             try
             {
@@ -83,8 +81,9 @@ namespace Chatography
             }
             catch (Exception ex)
             {
-                cerr.WriteLine(">> " + ex.ToString());
+                return false;
             }
+            return true;
         }
 
         private void addClient(TcpClient client)
@@ -117,10 +116,7 @@ namespace Chatography
                     cout.WriteLine("Client-" + clNo + ":" + dataFromClient);
                     cout.Flush();
                 }
-                catch (Exception ex)
-                {
-                    cerr.WriteLine("foo");
-                }
+                catch (Exception ex){}
             }
         }
 
@@ -169,43 +165,40 @@ namespace Chatography
             }
         }
 
+        public static void readStream(MemoryStream output)
+        {
+            StreamReader outputReader = new StreamReader(output);
+            int position = 0;
+            while (true)
+            {
+                output.Position = position;
+                string OUT = outputReader.ReadToEnd();
+                Console.Write(OUT);
+                position += OUT.Length;
+            }
+        }
+
         public static void Main(string[] args)
         {
-            /*MemoryStream chat1 = new MemoryStream();
+            MemoryStream chat1 = new MemoryStream();
             StreamWriter cout1 = new StreamWriter(chat1);
-            StreamReader cin1 = new StreamReader(chat1);
-
-            MemoryStream log1 = new MemoryStream();
-            StreamWriter lout1 = new StreamWriter(log1);
-            StreamReader lin1 = new StreamReader(log1);
+            Thread chatReader1 = new Thread(() => readStream(chat1)); // Start new thread reading the MemoryStream chat1
+            chatReader1.Start();
 
             MemoryStream chat2 = new MemoryStream();
-            StreamWriter cout2 = new StreamWriter(chat1);
-            StreamReader cin2 = new StreamReader(chat1);
+            StreamWriter cout2 = new StreamWriter(chat2);
+            Thread chatReader2 = new Thread(() => readStream(chat2)); // Start new thread reading the MemoryStream chat2
+            chatReader2.Start();
 
-            MemoryStream log2 = new MemoryStream();
-            StreamWriter lout2 = new StreamWriter(log1);
-            StreamReader lin2 = new StreamReader(log1);*/
-
-            Client client1 = new Client(Console.Out, Console.Error);
-            Client client2 = new Client(Console.Out, Console.Error, 421);
+            Client client1 = new Client(cout1);
+            Client client2 = new Client(cout2, 421);
 
             client1.findUser("127.0.0.1", 421);
 
-            /*chat1.Position = 0;
-            Console.WriteLine(cin1.ReadToEnd());
-            chat2.Position = 0;
-            Console.WriteLine(cin2.ReadToEnd());*/
-
             client1.message(0, "Hello");
-            Console.Out.Flush();
             client2.message(0, "Foo");
-            Console.Out.Flush();
 
-            /*chat2.Position = 0;
-            Console.WriteLine(cin2.ReadToEnd());*/
-
-            System.Threading.Thread.Sleep(1000);
+            Console.ReadKey();
             client1.close();
             client2.close();
         }
