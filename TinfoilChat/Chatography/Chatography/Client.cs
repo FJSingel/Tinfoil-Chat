@@ -64,6 +64,7 @@ namespace Chatography
         /// </summary>
         /// <param name="ip">The IP address of the user</param>
         /// <param name="port">The port number the user's client is using</param>
+        /// <returns>True if user is found otherwise false.</returns>
         public bool findUser(string ip, int port)
         {
             try
@@ -125,7 +126,13 @@ namespace Chatography
         /// </summary>
         /// <param name="clNo">Client number in online list</param>
         /// <param name="msg">Message to be sent</param>
-        private void message(int clNo, string msg)
+        public void message(int clNo, string msg)
+        {
+            Thread mThread = new Thread(() => messageThread(clNo, msg));
+            mThread.Start();
+        }
+
+        private void messageThread(int clNo, string msg)
         {
             byte[] bytesToSend = new byte[10025];
             bytesToSend = Encoding.ASCII.GetBytes(msg + '$');
@@ -143,15 +150,10 @@ namespace Chatography
         /// <param name="msg">Message to be sent</param>
         public void broadcast(string msg)
         {
-            byte[] bytesToSend = new byte[10025];
-            bytesToSend = Encoding.ASCII.GetBytes(msg + '$');
-            int bytesOfmsg = Encoding.ASCII.GetByteCount(msg + '$');
-            
-            foreach (TcpClient client in onlineClients)
+            for (int i = 0; i < onlineClients.Count; i++ )
             {
-                NetworkStream networkStream = client.GetStream();
-                networkStream.Write(bytesToSend, 0, bytesOfmsg);
-                networkStream.Flush();
+                Thread mThread = new Thread(() => messageThread(i, msg));
+                mThread.Start();
             }
         }
 
@@ -174,7 +176,8 @@ namespace Chatography
                 output.Position = position;
                 string OUT = outputReader.ReadToEnd();
                 Console.Write(OUT); //replace this line with function to output to UI
-                position += OUT.Length;
+                if(OUT.Length != 0)
+                    position += OUT.Length;
             }
         }
 
@@ -183,24 +186,27 @@ namespace Chatography
             MemoryStream chat1 = new MemoryStream();
             StreamWriter cout1 = new StreamWriter(chat1);
             Thread chatReader1 = new Thread(() => readStream(chat1)); // Start new thread reading the MemoryStream chat1
-            chatReader1.Start();
 
             MemoryStream chat2 = new MemoryStream();
             StreamWriter cout2 = new StreamWriter(chat2);
             Thread chatReader2 = new Thread(() => readStream(chat2)); // Start new thread reading the MemoryStream chat2
-            chatReader2.Start();
 
             Client client1 = new Client(cout1);
             Client client2 = new Client(cout2, 421);
 
+            chatReader1.Start();
+            chatReader2.Start();
+
             client1.findUser("127.0.0.1", 421);
 
-            client1.message(0, "Hello");
+            client1.message(0, "dang");
+            Thread.Sleep(500);
             client2.message(0, "Foo");
+            Thread.Sleep(500);
+            client1.message(0, "Hello");
+
 
             Console.ReadKey();
-            client1.close();
-            client2.close();
         }
 
         //#region OTRAdditions
