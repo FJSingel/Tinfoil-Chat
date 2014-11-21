@@ -10,24 +10,31 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace ChatUI
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for FindUser.xaml
     /// </summary>
-    public partial class LoginWindow : Window
+    public partial class FindUser : Window
     {
-        public LoginWindow()
+        public FindUser()
         {
             InitializeComponent();
         }
 
-        private void Attempt_Login(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //Login Method
+
+        }
+
+        private void textBoxEntryField_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                // Submit text
+            }
         }
     }
 }

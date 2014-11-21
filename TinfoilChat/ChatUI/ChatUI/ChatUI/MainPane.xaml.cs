@@ -41,5 +41,11 @@ namespace ChatUI
             About about = new About();
             about.Show();
         }
+
+        private void find_user(object sender, RoutedEventArgs e)
+        {
+            FindUser fUser = new FindUser();
+            fUser.Show();
+        }
     }
 }

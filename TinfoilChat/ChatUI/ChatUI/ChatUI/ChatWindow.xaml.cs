@@ -19,16 +19,27 @@ namespace ChatUI
     /// </summary>
     public partial class ChatWindow : Window
     {
+        private ChatUIBackend.ChatBackend _backend;
+
         public ChatWindow()
         {
             InitializeComponent();
+            _backend = new ChatUIBackend.ChatBackend(this.DisplayMessage);
+        }
+
+        public void DisplayMessage(ChatUIBackend.CompositeType composite)
+        {
+            string username = composite.Username == null ? "" : composite.Username;
+            string message = composite.Message == null ? "" : composite.Message;
+            textBoxChatPane.Text += (username + ": " + message + Environment.NewLine);
         }
 
         private void textBoxEntryField_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            if (e.Key == Key.Enter || e.Key == Key.Return)
             {
-                // Submit text
+                _backend.SendMessage(textBoxEntryField.Text);
+                textBoxEntryField.Clear();
             }
         }
     }
