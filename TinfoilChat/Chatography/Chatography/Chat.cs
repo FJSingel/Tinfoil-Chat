@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace Chatography
 {
-    class Client
+    class Chat
     {
         //OTRSessionManager _alice_otr_session_manager;
         static bool isOnline;
@@ -21,12 +21,12 @@ namespace Chatography
         List<Thread> connections;
         TextWriter cout;
 
-        public Client(TextWriter output)
+        public Chat(TextWriter output)
         {
             initialize(output);
         }
 
-        public Client(TextWriter output, int port)
+        public Chat(TextWriter output, int port)
         {
             portnum = port;
             initialize(output);
@@ -99,7 +99,7 @@ namespace Chatography
         /// Listens to the network stream from specified socket and writes data to output stream
         /// </summary>
         /// <param name="clSocket">Socket of Client</param>
-        /// <param name="clNo">Client number in online list</param>
+        /// <param name="clNo">Client number in online list, in order of added.</param>
         private void clientListener(TcpClient clSocket, int clNo)
         {
             NetworkStream networkStream;
@@ -117,14 +117,16 @@ namespace Chatography
                     cout.WriteLine("Client-" + clNo + ":" + dataFromClient);
                     cout.Flush();
                 }
-                catch (Exception ex){}
+                catch (Exception ex){
+                    Console.Error.WriteLine(ex.Message);
+                }
             }
         }
 
         /// <summary>
         /// Writes message to network stream of specified client's socket
         /// </summary>
-        /// <param name="clNo">Client number in online list</param>
+        /// <param name="clNo">Client number in online list, in order of added.</param>
         /// <param name="msg">Message to be sent</param>
         public void message(int clNo, string msg)
         {
@@ -191,8 +193,8 @@ namespace Chatography
             StreamWriter cout2 = new StreamWriter(chat2);
             Thread chatReader2 = new Thread(() => readStream(chat2)); // Start new thread reading the MemoryStream chat2
 
-            Client client1 = new Client(cout1);
-            Client client2 = new Client(cout2, 421);
+            Chat client1 = new Chat(cout1);
+            Chat client2 = new Chat(cout2, 421);
 
             chatReader1.Start();
             chatReader2.Start();
