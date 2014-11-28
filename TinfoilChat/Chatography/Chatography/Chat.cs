@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace Chatography
 {
-    class Chat
+    public class Chat
     {
         //OTRSessionManager _alice_otr_session_manager;
         static bool isOnline;
@@ -19,24 +19,27 @@ namespace Chatography
         Thread connection;
         List<TcpClient> onlineClients;
         List<Thread> connections;
+        MemoryStream chatStream;
         TextWriter cout;
 
-        public Chat(TextWriter output)
+        public Chat()
         {
-            initialize(output);
+            initialize();
         }
 
-        public Chat(TextWriter output, int port)
+        public Chat(int port)
         {
             portnum = port;
-            initialize(output);
+            initialize();
         }
 
-        private void initialize(TextWriter output)
+        private void initialize()
         {
             isOnline = true;
             onlineClients = new List<TcpClient>();
-            cout = output;
+
+            chatStream = new MemoryStream();
+            cout = new StreamWriter(chatStream);
 
             connections = new List<Thread>();
             connection = new Thread(() => waitForConnection());
@@ -169,6 +172,13 @@ namespace Chatography
             }
         }
 
+        public MemoryStream getChatStream()
+        {
+            return chatStream;
+        }
+
+
+        //Function to copy over for polling the output stream (separate from network stream)
         public static void readStream(MemoryStream output)
         {
             StreamReader outputReader = new StreamReader(output);
@@ -185,16 +195,11 @@ namespace Chatography
 
         public static void Main(string[] args)
         {
-            MemoryStream chat1 = new MemoryStream();
-            StreamWriter cout1 = new StreamWriter(chat1);
-            Thread chatReader1 = new Thread(() => readStream(chat1)); // Start new thread reading the MemoryStream chat1
+            Chat client1 = new Chat();
+            Chat client2 = new Chat(421);
 
-            MemoryStream chat2 = new MemoryStream();
-            StreamWriter cout2 = new StreamWriter(chat2);
-            Thread chatReader2 = new Thread(() => readStream(chat2)); // Start new thread reading the MemoryStream chat2
-
-            Chat client1 = new Chat(cout1);
-            Chat client2 = new Chat(cout2, 421);
+            Thread chatReader1 = new Thread(() => readStream(client1.getChatStream())); // Start new thread reading the MemoryStream chat1
+            Thread chatReader2 = new Thread(() => readStream(client2.getChatStream())); // Start new thread reading the MemoryStream chat2
 
             chatReader1.Start();
             chatReader2.Start();
