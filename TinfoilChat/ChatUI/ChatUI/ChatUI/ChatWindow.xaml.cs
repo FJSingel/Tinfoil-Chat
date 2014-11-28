@@ -11,6 +11,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Threading;
+using System.Net;
+using System.Net.Sockets;
+using System.IO;
+using Chatography;
 
 namespace ChatUI
 {
@@ -19,26 +24,67 @@ namespace ChatUI
     /// </summary>
     public partial class ChatWindow : Window
     {
-        private ChatUIBackend.ChatBackend _backend;
+        //private ChatUIBackend.ChatBackend _backend;
 
-        public ChatWindow()
+        private Chatography.Client _client;
+        private int port;
+        private string guestIP;
+        private int guestPort;
+
+        public ChatWindow() : this("420", "0.0.0.0", "421"){}
+
+        public ChatWindow(string port, string guestIP, string guestPort)
         {
+            // TODO: Complete member initialization
+            this.port = int.Parse(port);
+            this.guestIP = guestIP;
+            this.guestPort = int.Parse(guestPort);
+
             InitializeComponent();
-            _backend = new ChatUIBackend.ChatBackend(this.DisplayMessage);
+            //_backend = new ChatUIBackend.ChatBackend(this.DisplayMessage);
+            _client = new Chatography.Client(this.port);
+
+            // Start a new thread to listen for interaction
+            Thread chatReader = new Thread(() => Chatography.Client.readStream(_client.getChatStream()));
+            chatReader.Start();
+
+            // Wait to connect with the seeking user
+            _client.findUser(this.guestIP, this.guestPort);
+            
         }
 
-        public void DisplayMessage(ChatUIBackend.CompositeType composite)
+        public void clientThread(MemoryStream readStream){
+            StreamReader messageReader = new StreamReader(readStream);
+            int position = 0;
+            while (true)
+            {
+                readStream.Position = position;
+                string message = messageReader.ReadToEnd();
+                if (message.Length != 0)
+                {
+                    position += message.Length;
+                    Console.Write(message);
+                    DisplayMessage(message);
+                }
+            }
+        }
+
+        public void DisplayMessage(string message/*ChatUIBackend.CompositeType composite*/)
         {
+            /*
             string username = composite.Username == null ? "" : composite.Username;
             string message = composite.Message == null ? "" : composite.Message;
             textBoxChatPane.Text += (username + ": " + message + Environment.NewLine);
+             */
+            textBoxChatPane.Text += (message + Environment.NewLine);
         }
 
         private void textBoxEntryField_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {
-                _backend.SendMessage(textBoxEntryField.Text);
+                //_backend.SendMessage(textBoxEntryField.Text);
+                _client.message(0, textBoxEntryField.Text);
                 textBoxEntryField.Clear();
             }
         }

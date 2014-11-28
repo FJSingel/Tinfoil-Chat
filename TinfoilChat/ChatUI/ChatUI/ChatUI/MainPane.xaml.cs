@@ -42,10 +42,10 @@ namespace ChatUI
             about.Show();
         }
 
-        private void find_user(object sender, RoutedEventArgs e)
+        private void chat_setup(object sender, RoutedEventArgs e)
         {
-            FindUser fUser = new FindUser();
-            fUser.Show();
+            ChatSetup chat_setup = new ChatSetup();
+            chat_setup.Show();
         }
     }
 }

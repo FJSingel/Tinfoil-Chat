@@ -17,7 +17,7 @@
         <Button Content="Chat_Window" Height="Auto" Width="100" Margin="6,6,6,6" Click="launch_chat" Grid.Row="0" />
         <Button Content="Login" Height="Auto" Width="100" Margin="6,6,6,6" Click="launch_login" Grid.Row="1" />
         <Button Content="About" Height="Auto" Width="100" Margin="6,6,6,6" Click="launch_about" Grid.Row="2" />
-        <Button Content="Find User" Height="Auto" Width="100" Margin="6,6,6,6" Click="find_user" Grid.Row="2" />
+        <Button Content="Chat Setup" Height="Auto" Width="100" Margin="6,6,6,6" Click="chat_setup" Grid.Row="2" />
 
 
     </Grid>
