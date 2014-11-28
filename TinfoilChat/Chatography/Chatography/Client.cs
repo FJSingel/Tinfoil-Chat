@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace Chatography
 {
-    public class Chat
+    public class Client
     {
         //OTRSessionManager _alice_otr_session_manager;
         static bool isOnline;
@@ -22,12 +22,12 @@ namespace Chatography
         MemoryStream chatStream;
         TextWriter cout;
 
-        public Chat()
+        public Client()
         {
             initialize();
         }
 
-        public Chat(int port)
+        public Client(int port)
         {
             portnum = port;
             initialize();
@@ -195,8 +195,8 @@ namespace Chatography
 
         public static void Main(string[] args)
         {
-            Chat client1 = new Chat();
-            Chat client2 = new Chat(421);
+            Client client1 = new Client();
+            Client client2 = new Client(421);
 
             Thread chatReader1 = new Thread(() => readStream(client1.getChatStream())); // Start new thread reading the MemoryStream chat1
             Thread chatReader2 = new Thread(() => readStream(client2.getChatStream())); // Start new thread reading the MemoryStream chat2
