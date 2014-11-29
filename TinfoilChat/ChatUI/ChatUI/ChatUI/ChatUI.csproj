@@ -37,10 +37,6 @@
     <ApplicationIcon>TFC.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Chatography, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Chatography\Chatography\obj\Debug\Chatography.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -140,6 +136,10 @@
     <Resource Include="TFC.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Chatography\Chatography\Chatography.csproj">
+      <Project>{c5e907c2-58b9-4c8b-b2a3-6c40b37ab5ba}</Project>
+      <Name>Chatography</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ChatUIBackend\ChatUIBackend.csproj">
       <Project>{ec33782e-3845-400a-850a-9db3b91ab977}</Project>
       <Name>ChatUIBackend</Name>

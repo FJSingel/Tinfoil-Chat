@@ -77,7 +77,7 @@ namespace Chatography
             catch (Exception ex)
             {
                 Console.Error.Write(ex.Message);
-                System.Diagnostics.Debug.Write("Can't parse. Get wrecked.");
+                System.Diagnostics.Debug.Write("Can't parse. Get wrecked.: " + ex.Message);
                 return false;
             }
             try
@@ -87,8 +87,10 @@ namespace Chatography
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.Write("Unable to add client: " + ex.Message);
                 return false;
             }
+            System.Diagnostics.Debug.Write("Added Client");
             return true;
         }
 
@@ -180,7 +182,7 @@ namespace Chatography
         }
 
 
-        //Function to copy over for polling the output stream (separate from network stream)
+        /* Function to copy over for polling the output stream (separate from network stream)
         public static void readStream(MemoryStream output)
         {
             StreamReader outputReader = new StreamReader(output);
@@ -194,7 +196,9 @@ namespace Chatography
                     position += OUT.Length;
             }
         }
+         */
 
+        /*
         public static void Main(string[] args)
         {
             Client client1 = new Client();
@@ -218,6 +222,7 @@ namespace Chatography
             Console.ReadKey();
         }
 
+         * */
         //#region OTRAdditions
 
         //public void openOTRSession(String native_user_ID, String buddy_ID)

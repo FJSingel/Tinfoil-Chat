@@ -16,6 +16,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using Chatography;
+using System.Windows.Threading;
 
 namespace ChatUI
 {
@@ -45,12 +46,11 @@ namespace ChatUI
             _client = new Chatography.Client(this.port);
 
             // Start a new thread to listen for interaction
-            Thread chatReader = new Thread(() => Chatography.Client.readStream(_client.getChatStream()));
+            Thread chatReader = new Thread(() => clientThread(_client.getChatStream()));
             chatReader.Start();
 
             // Wait to connect with the seeking user
             _client.findUser(this.guestIP, this.guestPort);
-            
         }
 
         public void clientThread(MemoryStream readStream){
@@ -62,9 +62,9 @@ namespace ChatUI
                 string message = messageReader.ReadToEnd();
                 if (message.Length != 0)
                 {
-                    position += message.Length;
+                    position += message.Length; 
+                    this.DisplayMessage(message);
                     Console.Write(message);
-                    DisplayMessage(message);
                 }
             }
         }
@@ -76,7 +76,17 @@ namespace ChatUI
             string message = composite.Message == null ? "" : composite.Message;
             textBoxChatPane.Text += (username + ": " + message + Environment.NewLine);
              */
-            textBoxChatPane.Text += (message + Environment.NewLine);
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, new ThreadStart(() =>
+            {
+                try
+                {
+                    textBoxChatPane.Text += (message + Environment.NewLine);
+                }
+                catch(Exception ex)
+                {
+                    System.Diagnostics.Debug.Write(ex.Message);
+                }
+            }));
         }
 
         private void textBoxEntryField_KeyDown(object sender, KeyEventArgs e)
@@ -84,6 +94,7 @@ namespace ChatUI
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {
                 //_backend.SendMessage(textBoxEntryField.Text);
+                this.DisplayMessage(textBoxEntryField.Text);
                 _client.message(0, textBoxEntryField.Text);
                 textBoxEntryField.Clear();
             }
