@@ -80,7 +80,7 @@ namespace ChatUI
             {
                 try
                 {
-                    textBoxChatPane.Text += (message + Environment.NewLine);
+                    textBoxChatPane.AppendText(message);
                 }
                 catch(Exception ex)
                 {
@@ -93,10 +93,17 @@ namespace ChatUI
         {
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {
-                //_backend.SendMessage(textBoxEntryField.Text);
-                this.DisplayMessage(textBoxEntryField.Text);
-                _client.message(0, textBoxEntryField.Text);
-                textBoxEntryField.Clear();
+                try
+                {
+                    this.DisplayMessage("You: " + textBoxEntryField.Text + Environment.NewLine);
+                    _client.message(0, textBoxEntryField.Text);
+                    textBoxEntryField.Clear();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Unable to send message: " + ex.Message, "Unable to Send Message", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                
             }
         }
     }
