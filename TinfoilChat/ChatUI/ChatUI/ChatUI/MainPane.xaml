@@ -1,7 +1,8 @@
 ﻿<Window x:Class="ChatUI.MainPane"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Window1" Height="512" Width="329">
+        Title="Window1" Height="512" Width="329"
+        Icon="./favicon.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
