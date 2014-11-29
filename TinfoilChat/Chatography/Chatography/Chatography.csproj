@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C5E907C2-58B9-4C8B-B2A3-6C40B37AB5BA}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Chatography</RootNamespace>
     <AssemblyName>Chatography</AssemblyName>
@@ -35,10 +35,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto">
-      <HintPath>..\..\OTRLib\OTRLib\bin\Debug\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
-    <Reference Include="OTRLib">
+    <Reference Include="OTRLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\OTRLib\OTRLib\bin\Debug\OTRLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -50,11 +48,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client.cs" />
+    <Compile Include="NetworkModule\Client.cs" />
+    <Compile Include="Example.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserModule\UserManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="user_data.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
