@@ -63,6 +63,11 @@ namespace Chatography.NetworkModule
             waitingSocket.Stop();
         }
 
+        public bool findUser(string ip)
+        {
+            return findUser(ip, portnum);
+        }
+
         /// <summary>
         /// Attempts to connect to a user at specified ip address and port number
         /// </summary>

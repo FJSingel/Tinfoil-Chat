@@ -18,5 +18,28 @@ namespace Chatography.UserModule
         {
             client = new Client();
         }
+
+        public void initialize()
+        {
+            List<int> users = new List<int>();
+            foreach (int user in users)
+            {
+                List<string> ipaddresses = new List<string>();
+                foreach (string ip in ipaddresses)
+                {
+                    if (client.findUser(ip))
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void addUser()
+        {
+
+        }
+
+
     }
 }
