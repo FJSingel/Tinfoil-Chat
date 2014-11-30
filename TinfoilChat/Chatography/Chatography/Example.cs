@@ -12,17 +12,16 @@ using Chatography.NetworkModule;
 public class Example
 {
     //Function to copy over for polling the output stream (separate from network stream)
-    public static void readStream(MemoryStream output)
+    public static void readQueue(Queue<byte[]> messageQueue, bool end)
     {
-        StreamReader outputReader = new StreamReader(output);
-        int position = 0;
-        while (true)
+        while (!end)
         {
-            output.Position = position;
-            string OUT = outputReader.ReadToEnd();
-            Console.Write(OUT); //replace this line with function to output to UI
-            if (OUT.Length != 0)
-                position += OUT.Length;
+            if (messageQueue.Count != 0)
+            {
+                byte[] msg = messageQueue.Dequeue();
+                string message = Encoding.UTF8.GetString(msg);
+                Console.WriteLine(message);
+            }
         }
     }
 
@@ -30,31 +29,41 @@ public class Example
     {
         Client client1 = new Client();
         Client client2 = new Client(421);
-        Client client3 = new Client(423);
 
-        Thread chatReader1 = new Thread(() => readStream(client1.getChatStream())); // Start new thread reading the MemoryStream chat1
-        Thread chatReader2 = new Thread(() => readStream(client2.getChatStream())); // Start new thread reading the MemoryStream chat2
+        bool kill = false;
 
-        chatReader1.Start();
-        chatReader2.Start();
+        byte[] msg = Encoding.UTF8.GetBytes("Hello");
 
         if (client1.findUser("127.0.0.1", 421))
         {
+            Dictionary<TcpClient, Queue<byte[]>> thingy1 = client1.getOnlineClients();
+            Dictionary<TcpClient, Queue<byte[]>> thingy2 = client2.getOnlineClients();
+
+            TcpClient tcpclient1 = thingy1.Keys.First();
+            TcpClient tcpclient2 = thingy2.Keys.First();
+
+            Queue<byte[]> msgQueue1;
+            thingy1.TryGetValue(tcpclient1, out msgQueue1);
+            Queue<byte[]> msgQueue2;
+            thingy2.TryGetValue(tcpclient2, out msgQueue2);
+
+            Thread chatReader1 = new Thread(() => readQueue(msgQueue1, kill));
+            Thread chatReader2 = new Thread(() => readQueue(msgQueue2, kill));
+
             Thread.Sleep(500);
-            client1.message(0, "dang");
+
+            chatReader1.Start();
+            chatReader2.Start();
+
             Thread.Sleep(500);
-            client2.message(0, "Foo");
+            client1.message(tcpclient1, msg);
             Thread.Sleep(500);
-            client1.message(0, "Hello");
-            Thread.Sleep(500);
-            client3.findUser("127.0.0.1", 420);
-            Thread.Sleep(500);
-            client3.message(0, "Hi");
         }
 
         Console.ReadKey();
 
         client1.close();
         client2.close();
+        kill = true;
     }
 }

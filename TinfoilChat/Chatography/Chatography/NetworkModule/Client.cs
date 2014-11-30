@@ -11,14 +11,14 @@ namespace Chatography.NetworkModule
 {
     public class Client
     {
-        static bool isOnline;
+        bool isOnline;
         int portnum = 420;
-        Thread connection;
 
-        List<TcpClient> onlineClients;
+        TcpListener serverSocket;
+        Dictionary<TcpClient, Queue<byte[]>> onlineClients;
+
+        Thread portListener;
         List<Thread> connections;
-        MemoryStream chatStream;
-        TextWriter cout;
 
         public Client()
         {
@@ -34,32 +34,33 @@ namespace Chatography.NetworkModule
         private void initialize()
         {
             isOnline = true;
-            onlineClients = new List<TcpClient>();
 
-            chatStream = new MemoryStream();
-            cout = new StreamWriter(chatStream);
+#pragma warning disable 618     //ignores the deprecated TcpListener constructor
+            serverSocket = new TcpListener(portnum);
+#pragma warning restore 618
 
+            onlineClients = new Dictionary<TcpClient, Queue<byte[]>>();
             connections = new List<Thread>();
-            connection = new Thread(() => waitForConnection(isOnline));
-            connection.Start();
+
+            portListener = new Thread(() => waitForConnection(isOnline, serverSocket));
+            portListener.Start();
         }
 
         /// <summary>
         /// Is the thread listening on the default or otherwise specified socket for connections
         /// </summary>
-        private void waitForConnection(bool online)
+        private void waitForConnection(bool online, TcpListener waitingSocket)
         {
-#pragma warning disable 618     //ignores the deprecated TcpListener constructor
-            TcpListener serverSocket = new TcpListener(portnum);
-#pragma warning restore 618
 
-            serverSocket.Start();
+            waitingSocket.Start();
 
             while (online)
             {
-                TcpClient nextClient = serverSocket.AcceptTcpClient();
+                TcpClient nextClient = waitingSocket.AcceptTcpClient();
                 addClient(nextClient);
             }
+
+            waitingSocket.Stop();
         }
 
         /// <summary>
@@ -70,14 +71,6 @@ namespace Chatography.NetworkModule
         /// <returns>True if user is found otherwise false.</returns>
         public bool findUser(string ip, int port)
         {
-            try
-            {
-                IPAddress.Parse(ip);
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
             try
             {
                 TcpClient nextClient = new TcpClient(ip, port);
@@ -92,9 +85,10 @@ namespace Chatography.NetworkModule
 
         private void addClient(TcpClient client)
         {
-            onlineClients.Add(client);
-            Thread cThread = new Thread(() => clientListener(isOnline, client, onlineClients.Count - 1));
-            cout.WriteLine("Client-" + (onlineClients.Count - 1) + " online!");
+            Queue<byte[]> messageQueue = new Queue<byte[]>();
+            onlineClients.Add(client,messageQueue);
+            Thread cThread = new Thread(() => clientListener(isOnline, client, messageQueue));
+            connections.Add(cThread);
             cThread.Start();
         }
 
@@ -103,27 +97,65 @@ namespace Chatography.NetworkModule
         /// </summary>
         /// <param name="clSocket">Socket of Client</param>
         /// <param name="clNo">Client number in online list, in order of added.</param>
-        private void clientListener(bool online, TcpClient clSocket, int clNo)
+        private void clientListener(bool online, TcpClient clSocket, Queue<byte[]> messageQueue)
         {
             NetworkStream networkStream;
-            string dataFromClient = null;
             byte[] bytesFrom = new byte[clSocket.ReceiveBufferSize];
 
-            while (online)
+            while (online && clSocket.Connected)
             {
                 try
                 {
                     networkStream = clSocket.GetStream();
                     networkStream.Read(bytesFrom, 0, clSocket.ReceiveBufferSize);
-                    dataFromClient = Encoding.ASCII.GetString(bytesFrom);
-                    dataFromClient = dataFromClient.Substring(0,dataFromClient.IndexOf('$'));
-                    cout.WriteLine("Client-" + clNo + ":" + dataFromClient);
-                    cout.Flush();
+                    int msgSize = 1;
+                    foreach (byte byt in bytesFrom)
+                    {
+                        if (byt == 0)
+                        {
+                            break;
+                        }
+                        msgSize++;
+                    }
+                    byte[] msgBytes = new byte[msgSize];
+                    Array.Copy(bytesFrom, msgBytes, msgSize);
+                    messageQueue.Enqueue(msgBytes);
                 }
-                catch (Exception ex){
+                catch (Exception ex)
+                {
                     Console.Error.WriteLine(ex.Message);
                 }
             }
+        }
+
+        private int indexOfSubArray(byte[] arrayToSearchIn, byte[] arrayToSearchFor)
+        {
+            int index = 0;
+            for (int i = 0; i < (arrayToSearchIn.Length - arrayToSearchFor.Length) + 1; i++)
+            {
+                index = i;
+                if (arrayToSearchIn[i] == arrayToSearchFor[0])
+                {
+                    bool completeMatch = true;
+                    for (int j = 1; j < arrayToSearchFor.Length; j++)
+                    {
+                        if (arrayToSearchIn[i+j] != arrayToSearchFor[j])
+                        {
+                            completeMatch = false;
+                            break;
+                        }
+                    }
+                    if (completeMatch)
+                    {
+                        break;
+                    }
+                }
+            }
+            if (arrayToSearchIn[index] != arrayToSearchFor[0])
+            {
+                return -1;
+            }
+            return index;
         }
 
         /// <summary>
@@ -131,50 +163,62 @@ namespace Chatography.NetworkModule
         /// </summary>
         /// <param name="clNo">Client number in online list, in order of added.</param>
         /// <param name="msg">Message to be sent</param>
-        public void message(int clNo, string msg)
+        public void message(TcpClient client, byte[] msg)
         {
-            Thread mThread = new Thread(() => messageThread(clNo, msg));
+            Thread mThread = new Thread(() => messageThread(client, msg));
             mThread.Start();
-        }
-
-        private void messageThread(int clNo, string msg)
-        {
-            byte[] bytesToSend = new byte[10025];
-            bytesToSend = Encoding.ASCII.GetBytes(msg + '$');
-            int bytesOfmsg = Encoding.ASCII.GetByteCount(msg + '$');
-
-            TcpClient client = onlineClients.ElementAt(clNo);
-            NetworkStream networkStream = client.GetStream();
-            networkStream.Write(bytesToSend, 0, bytesOfmsg);
-            networkStream.Flush();
         }
 
         /// <summary>
         /// Writes message to every connected clients' socket's network stream
         /// </summary>
         /// <param name="msg">Message to be sent</param>
-        public void broadcast(string msg)
+        public void broadcast(byte[] msg)
         {
-            for (int i = 0; i < onlineClients.Count; i++ )
+            foreach (TcpClient client in onlineClients.Keys)
             {
-                Thread mThread = new Thread(() => messageThread(i, msg));
+                Thread mThread = new Thread(() => messageThread(client, msg));
                 mThread.Start();
             }
+        }
+
+        private void messageThread(TcpClient client, byte[] msg)
+        {
+            int bytesOfmsg = msg.Length + 1;
+            byte[] bytesToSend = new byte[bytesOfmsg];
+
+            msg.CopyTo(bytesToSend, 0);
+            Byte terminate = 0;
+            bytesToSend.SetValue(terminate, msg.Length);
+
+            NetworkStream networkStream = client.GetStream();
+            networkStream.Write(bytesToSend, 0, bytesOfmsg);
+            networkStream.Flush();
         }
 
         public void close()
         {
             isOnline = false;
-            connection.Abort();
+
+            Thread.Sleep(500);
+
+            portListener.Abort();
+            serverSocket.Stop();
+
             foreach (Thread thread in connections)
             {
                 thread.Abort();
             }
+
+            foreach (TcpClient client in onlineClients.Keys)
+            {
+                client.Close();
+            }
         }
 
-        public MemoryStream getChatStream()
+        public Dictionary<TcpClient, Queue<byte[]>> getOnlineClients()
         {
-            return chatStream;
+            return onlineClients;
         }
     }
 }
