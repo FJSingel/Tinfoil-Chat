@@ -14,6 +14,7 @@ namespace Chatography.UserModule
     {
         private DSAKeyParams keyParams;
         private LinkedList<String> lastKnownIPAddresses;
+        private string fingerprint;
 
         public User(DSAKeyParams keyp)
         {
@@ -39,7 +40,18 @@ namespace Chatography.UserModule
         public void addIPAddress(String IPAddress)
         {
             lastKnownIPAddresses.AddFirst(IPAddress);
-        } 
+        }
+
+        public string getFingerprint()
+        {
+            return fingerprint;
+        }
+
+        public void setFingerprint(string fp)
+        {
+            //Fingerprint can be gotten using the sessionmanager's getMyBuddyFingerprint method
+            fingerprint = fp;
+        }
 
         public override string ToString()
         {
