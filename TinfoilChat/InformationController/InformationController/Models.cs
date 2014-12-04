@@ -35,6 +35,8 @@ namespace InformationController
     {
         public string IPAddress { get; set; }
 
+        internal ConnectionModel() { }
+
         public override string ModelName()
         {
             return "Connection";
@@ -47,6 +49,8 @@ namespace InformationController
 
         public string[] Aliases { get; set; }
 
+        internal FriendModel() { }
+
         public ConnectionModel[] KnownConnections { get; set; }
 
         public override string ModelName()
@@ -58,6 +62,8 @@ namespace InformationController
     public class SelfModel : Model
     {
         public string Alias { get; set; }
+
+        internal SelfModel() { }
 
         public override string ModelName()
         {
