@@ -10,13 +10,29 @@ namespace InformationController
 {
     public class SecurePublisher
     {
+        private static Dictionary<string, SecurePublisher> publishers = new Dictionary<string, SecurePublisher>();
+
+        private static SecurePublisher GetInstance(string filename)
+        {
+            SecurePublisher publisher;
+            if (publishers.TryGetValue(filename, out publisher))
+            {
+                return publisher;
+            }
+            else
+            {
+                publishers[filename] = publisher;
+                return publisher;
+            }
+        }
+
         private string filename;
 
         private List<Model> modelsById;
 
         private Dictionary<string, List<Model>> modelsByType;
 
-        public SecurePublisher(string filename)
+        private SecurePublisher(string filename)
         {
             this.filename = filename;
             this.modelsById = new List<Model>();
