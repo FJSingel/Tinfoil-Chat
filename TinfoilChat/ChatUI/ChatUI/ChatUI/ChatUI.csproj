@@ -71,9 +71,11 @@
     <Compile Include="ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NetworkModule\Client.cs" />
     <Compile Include="MainPane.xaml.cs">
       <DependentUpon>MainPane.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Session.cs" />
     <Page Include="ChatSetup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -137,10 +139,6 @@
     <Resource Include="TFC.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Chatography\Chatography\Chatography.csproj">
-      <Project>{c5e907c2-58b9-4c8b-b2a3-6c40b37ab5ba}</Project>
-      <Name>Chatography</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ChatUIBackend\ChatUIBackend.csproj">
       <Project>{ec33782e-3845-400a-850a-9db3b91ab977}</Project>
       <Name>ChatUIBackend</Name>
