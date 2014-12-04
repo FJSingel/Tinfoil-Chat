@@ -71,17 +71,24 @@
     <Compile Include="ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>
+<<<<<<< HEAD
     <Compile Include="Class1.cs" />
+=======
+    <Compile Include="NetworkModule\Client.cs" />
+>>>>>>> 1f6ea1e8ed59432e19c82fd0d77a38a9cefe6797
     <Compile Include="MainPane.xaml.cs">
       <DependentUpon>MainPane.xaml</DependentUpon>
     </Compile>
     <Compile Include="Session.cs" />
+<<<<<<< HEAD
     <Compile Include="VerifyUser.xaml.cs">
       <DependentUpon>VerifyUser.xaml</DependentUpon>
     </Compile>
     <Compile Include="Window2.xaml.cs">
       <DependentUpon>Window2.xaml</DependentUpon>
     </Compile>
+=======
+>>>>>>> 1f6ea1e8ed59432e19c82fd0d77a38a9cefe6797
     <Page Include="ChatSetup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -153,10 +160,6 @@
     <Resource Include="TFC.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Chatography\Chatography\Chatography.csproj">
-      <Project>{c5e907c2-58b9-4c8b-b2a3-6c40b37ab5ba}</Project>
-      <Name>Chatography</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ChatUIBackend\ChatUIBackend.csproj">
       <Project>{ec33782e-3845-400a-850a-9db3b91ab977}</Project>
       <Name>ChatUIBackend</Name>

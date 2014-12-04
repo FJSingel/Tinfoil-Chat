@@ -7,7 +7,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace Chatography.NetworkModule
+using ChatUI;
+
+namespace ChatUI.NetworkModule
 {
     public class Client
     {
@@ -15,7 +17,8 @@ namespace Chatography.NetworkModule
         int portnum = 420;
 
         TcpListener serverSocket;
-        Dictionary<TcpClient, Queue<byte[]>> onlineClients;
+        HashSet<TcpClient> onlineClients;
+        HashSet<IPAddress> ignoreList;
 
         Thread portListener;
         List<Thread> connections;
@@ -35,11 +38,11 @@ namespace Chatography.NetworkModule
         {
             isOnline = true;
 
-#pragma warning disable 618     //ignores the deprecated TcpListener constructor
+#pragma warning disable 618     //ignores the deprecated TcpListener constructor warning
             serverSocket = new TcpListener(portnum);
 #pragma warning restore 618
 
-            onlineClients = new Dictionary<TcpClient, Queue<byte[]>>();
+            onlineClients = new HashSet<TcpClient>();
             connections = new List<Thread>();
 
             portListener = new Thread(() => waitForConnection(isOnline, serverSocket));
@@ -57,13 +60,20 @@ namespace Chatography.NetworkModule
             while (online)
             {
                 TcpClient nextClient = waitingSocket.AcceptTcpClient();
+                IPAddress nextClientIP = ((IPEndPoint)nextClient.Client.RemoteEndPoint).Address;
+                if (ignoreList.Contains(nextClientIP))
+                {
+                    nextClient.Close();
+                    continue;
+                }
                 addClient(nextClient);
+                Session.currentSession.newUser(nextClient);
             }
 
             waitingSocket.Stop();
         }
 
-        public bool findUser(string ip)
+        public TcpClient findUser(string ip)
         {
             return findUser(ip, portnum);
         }
@@ -73,26 +83,26 @@ namespace Chatography.NetworkModule
         /// </summary>
         /// <param name="ip">The IP address of the user</param>
         /// <param name="port">The port number the user's client is using</param>
-        /// <returns>True if user is found otherwise false.</returns>
-        public bool findUser(string ip, int port)
+        /// <returns>TcpClient of User at IP address/port specified if the connection was successful, otherwise null.</returns>
+        public TcpClient findUser(string ip, int port)
         {
+            TcpClient client = null;
             try
             {
-                TcpClient nextClient = new TcpClient(ip, port);
-                addClient(nextClient);
+                client = new TcpClient(ip, port);
+                addClient(client);
             }
             catch (Exception ex)
             {
-                return false;
+                Console.Error.WriteLine(ex.Message);
             }
-            return true;
+            return client;
         }
 
         private void addClient(TcpClient client)
         {
-            Queue<byte[]> messageQueue = new Queue<byte[]>();
-            onlineClients.Add(client,messageQueue);
-            Thread cThread = new Thread(() => clientListener(isOnline, client, messageQueue));
+            onlineClients.Add(client);
+            Thread cThread = new Thread(() => clientListener(isOnline, client));
             connections.Add(cThread);
             cThread.Start();
         }
@@ -100,9 +110,10 @@ namespace Chatography.NetworkModule
         /// <summary>
         /// Listens to the network stream from specified socket and writes data to output stream
         /// </summary>
+        /// <param name="online">The isOnline boolean needed to shutdown threads</param>
         /// <param name="clSocket">Socket of Client</param>
-        /// <param name="clNo">Client number in online list, in order of added.</param>
-        private void clientListener(bool online, TcpClient clSocket, Queue<byte[]> messageQueue)
+        /// <param name="messageQueue">Client number in online list, in order of added.</param>
+        private void clientListener(bool online, TcpClient clSocket)
         {
             NetworkStream networkStream;
             byte[] bytesFrom = new byte[clSocket.ReceiveBufferSize];
@@ -124,7 +135,7 @@ namespace Chatography.NetworkModule
                     }
                     byte[] msgBytes = new byte[msgSize];
                     Array.Copy(bytesFrom, msgBytes, msgSize);
-                    messageQueue.Enqueue(msgBytes);
+                    Session.currentSession.newMessage(msgBytes);
                 }
                 catch (Exception ex)
                 {
@@ -133,40 +144,10 @@ namespace Chatography.NetworkModule
             }
         }
 
-        private int indexOfSubArray(byte[] arrayToSearchIn, byte[] arrayToSearchFor)
-        {
-            int index = 0;
-            for (int i = 0; i < (arrayToSearchIn.Length - arrayToSearchFor.Length) + 1; i++)
-            {
-                index = i;
-                if (arrayToSearchIn[i] == arrayToSearchFor[0])
-                {
-                    bool completeMatch = true;
-                    for (int j = 1; j < arrayToSearchFor.Length; j++)
-                    {
-                        if (arrayToSearchIn[i+j] != arrayToSearchFor[j])
-                        {
-                            completeMatch = false;
-                            break;
-                        }
-                    }
-                    if (completeMatch)
-                    {
-                        break;
-                    }
-                }
-            }
-            if (arrayToSearchIn[index] != arrayToSearchFor[0])
-            {
-                return -1;
-            }
-            return index;
-        }
-
         /// <summary>
         /// Writes message to network stream of specified client's socket
         /// </summary>
-        /// <param name="clNo">Client number in online list, in order of added.</param>
+        /// <param name="client">TcpClient in online list.</param>
         /// <param name="msg">Message to be sent</param>
         public void message(TcpClient client, byte[] msg)
         {
@@ -180,7 +161,14 @@ namespace Chatography.NetworkModule
         /// <param name="msg">Message to be sent</param>
         public void broadcast(byte[] msg)
         {
-            foreach (TcpClient client in onlineClients.Keys)
+            int bytesOfmsg = msg.Length + 1;
+            byte[] bytesToSend = new byte[bytesOfmsg];
+
+            msg.CopyTo(bytesToSend, 0);
+            Byte terminate = 0;
+            bytesToSend.SetValue(terminate, msg.Length);
+
+            foreach (TcpClient client in onlineClients)
             {
                 Thread mThread = new Thread(() => messageThread(client, msg));
                 mThread.Start();
@@ -215,15 +203,17 @@ namespace Chatography.NetworkModule
                 thread.Abort();
             }
 
-            foreach (TcpClient client in onlineClients.Keys)
+            foreach (TcpClient client in onlineClients)
             {
                 client.Close();
             }
         }
 
-        public Dictionary<TcpClient, Queue<byte[]>> getOnlineClients()
+        public void ignore(TcpClient client)
         {
-            return onlineClients;
+            ignoreList.Add(((IPEndPoint)client.Client.RemoteEndPoint).Address);
+            onlineClients.Remove(client);
+            client.Close();
         }
     }
 }
