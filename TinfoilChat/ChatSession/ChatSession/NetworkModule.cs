@@ -7,11 +7,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-using ChatUI;
-
-namespace ChatUI.NetworkModule
+namespace ChatSession
 {
-    public class Client
+    public class NetworkModule
     {
         bool isOnline;
         int portnum = 420;
@@ -23,12 +21,12 @@ namespace ChatUI.NetworkModule
         Thread portListener;
         List<Thread> connections;
 
-        public Client()
+        public NetworkModule()
         {
             initialize();
         }
 
-        public Client(int port)
+        public NetworkModule(int port)
         {
             portnum = port;
             initialize();
