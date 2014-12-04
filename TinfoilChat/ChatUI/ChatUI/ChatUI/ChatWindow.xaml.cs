@@ -15,7 +15,7 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
-using Chatography;
+using ChatUI.NetworkModule;
 using System.Windows.Threading;
 
 namespace ChatUI
@@ -27,7 +27,7 @@ namespace ChatUI
     {
         //private ChatUIBackend.ChatBackend _backend;
 
-        private Chatography.Client _client;
+        private Client _client;
         private int port;
         private string guestIP;
         private int guestPort;
@@ -43,11 +43,13 @@ namespace ChatUI
 
             InitializeComponent();
             //_backend = new ChatUIBackend.ChatBackend(this.DisplayMessage);
-            _client = new Chatography.Client(this.port);
+            _client = new Client(this.port);
 
             // Start a new thread to listen for interaction
-            Thread chatReader = new Thread(() => clientThread(_client.getChatStream()));
+            /*Thread chatReader = new Thread(() => clientThread(_client.getChatStream()));
             chatReader.Start();
+             * Dead Code
+             */
 
             // Wait to connect with the seeking user
             _client.findUser(this.guestIP, this.guestPort);
@@ -96,7 +98,7 @@ namespace ChatUI
                 try
                 {
                     this.DisplayMessage("You: " + textBoxEntryField.Text + Environment.NewLine);
-                    _client.message(0, textBoxEntryField.Text);
+                    //_client.message(0, textBoxEntryField.Text);
                     textBoxEntryField.Clear();
                 }
                 catch (Exception ex)
