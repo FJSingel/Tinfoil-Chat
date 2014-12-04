@@ -38,6 +38,9 @@
     <ApplicationIcon>TFC.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ChatSession">
+      <HintPath>..\..\..\ChatSession\ChatSession\bin\Debug\ChatSession.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -71,11 +74,9 @@
     <Compile Include="ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NetworkModule\Client.cs" />
     <Compile Include="MainPane.xaml.cs">
       <DependentUpon>MainPane.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Session.cs" />
     <Compile Include="VerifyUser.xaml.cs">
       <DependentUpon>VerifyUser.xaml</DependentUpon>
     </Compile>
