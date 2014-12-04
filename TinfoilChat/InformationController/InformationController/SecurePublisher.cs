@@ -96,7 +96,6 @@ namespace InformationController
             model.Id = id;
             this.RegisterModel(model);
             return model;
-
         }
 
         public IEnumerable<ModelType> GetAllModels<ModelType> () where ModelType : Model, new()
