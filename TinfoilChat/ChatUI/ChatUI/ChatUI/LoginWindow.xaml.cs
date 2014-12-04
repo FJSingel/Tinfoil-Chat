@@ -25,9 +25,10 @@ namespace ChatUI
             InitializeComponent();
         }
 
-        private void Attempt_Login(object sender, RoutedEventArgs e)
+        private void Launch(object sender, RoutedEventArgs e)
         {
-            //Login Method
+            // Launch Chat
+
         }
     }
 }

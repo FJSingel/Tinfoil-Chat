@@ -22,6 +22,7 @@ namespace ChatUI
         public MainPane()
         {
             InitializeComponent();
+            InitializeClient();
         }
 
         public void launch_chat(object sender, RoutedEventArgs args)
@@ -46,6 +47,10 @@ namespace ChatUI
         {
             ChatSetup chat_setup = new ChatSetup();
             chat_setup.Show();
+        }
+
+        private void InitializeClient(){
+
         }
     }
 }

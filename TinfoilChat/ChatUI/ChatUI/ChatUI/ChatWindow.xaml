@@ -12,10 +12,12 @@
             <ColumnDefinition Width="100*" />
         </Grid.ColumnDefinitions>
         <ScrollViewer>
-            <TextBox Height="Auto" HorizontalAlignment="Stretch" Margin="6,10,6,2" Name="textBoxChatPane" VerticalAlignment="Stretch" Width="Auto" Grid.Row="0" />
+            <TextBox Height="Auto" HorizontalAlignment="Stretch" Name="textBoxChatPane" VerticalAlignment="Stretch" Width="Auto" Grid.Row="0" />
         </ScrollViewer>
-        <TextBox Height="Auto" HorizontalAlignment="Stretch" Margin="10,2,2,10" Name="textBoxEntryField" VerticalAlignment="Stretch" Width="Auto" Grid.Row="1" Grid.Column="0" KeyDown="textBoxEntryField_KeyDown" />
-        <TextBox BorderThickness="0"  IsReadOnly="True" Height="Auto" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="UsersPane" VerticalAlignment="Stretch" Width="Auto" Grid.Row="0" Grid.Column="1" Text="Users:"/>
+        <TextBox BorderThickness="1"  IsReadOnly="True" Height="192" HorizontalAlignment="Stretch" Margin="6,6,6,0" Name="UsersPane" VerticalAlignment="Top" Width="Auto" Grid.Row="0" Grid.Column="1" Text="Users:"/>
+
+        <TextBox Height="Auto" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="textBoxEntryField" VerticalAlignment="Stretch" Width="Auto" Grid.Row="1" Grid.Column="0" KeyDown="textBoxEntryField_KeyDown" />
         <Button Height="Auto" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="sendBtn" VerticalAlignment="Stretch" Width="Auto" Grid.Row="1" Grid.Column="1" Content="Send" />
+        <Button Content="Invite User" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="6,6,6,6" Grid.Column="1" Width="94"/>
     </Grid>
 </Window>
