@@ -11,6 +11,14 @@ namespace ChatSession
     {
         public static Session currentSession;
 
+        private static NetworkModule nModule = NetworkModule.networkModule;
+
+        private HashSet<TcpClient> verifiedUsers;
+        private HashSet<TcpClient> unverifiedUsers;
+
+        private Dictionary<int, Chat> verificationProcesses;
+        private Dictionary<int, Chat> chats;
+
         public Session()
         {
             if (currentSession == null)
@@ -21,18 +29,174 @@ namespace ChatSession
             {
                 throw new Exception("Attempting to create a second session.");
             }
+
+            NetworkModule.networkModule = new NetworkModule();
+
+            verifiedUsers = new HashSet<TcpClient>();
+            unverifiedUsers = new HashSet<TcpClient>();
+            chats = new Dictionary<int, Chat>();
         }
 
-        public void newUser(TcpClient client)
+        /// <summary>
+        /// This is the function the UI calls to add a new user
+        /// </summary>
+        /// <param name="ip">The IP address the user is located at</param>
+        public void addUser(String ip)
         {
-            // More stuff here
+            TcpClient man = nModule.findUser(ip);
+            unverifiedUsers.Add(man);
+
+            Chat verificationProcess = new Chat();
+            verificationProcesses.Add(0, verificationProcess);
+
+            verificationProcess.message(new byte[]{});                                                             // Frank some validation process begins here.
         }
 
-        public void newMessage(byte[] msg)
+        /// <summary>
+        /// This is the signaled function that the NetworkModule calls when it receives a new connection (a new user initiates a connection to you).
+        /// </summary>
+        /// <param name="newUser"></param>
+        public void signalNewUser(TcpClient newUser)
         {
-            // alerts
+            unverifiedUsers.Add(newUser);
+        }
+
+                                                                                                                    // FRAAAAAAANK FIIIITTZZZZZ Messages are processed here (all types in switch-case)
+
+        /// <summary>
+        /// This is the signaled function that the NetworkModule calls when it receives a message.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="msg"></param>
+        public void signalNewMessage(msgType type, byte[] msg)
+        {
+            ChatMessage message = new ChatMessage(msg);
+            Chat chat = null;
+            if (chats.TryGetValue(message.getChatID(), out chat))
+            {
+
+            }
+            switch (type)
+            {
+                case msgType.Verification:
+
+                    break;
+                case msgType.Internal:
+
+                    break;
+                case msgType.Chat:
+                                                                                                                    // FITZ Here's to you kid. Should signal some function in UI to output message.
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// This class is a container for a chatMessage and the chatID it belongs to.
+        /// It can return a byte array containing both information before sending to the stream.
+        /// It can also parse a byte array from that same stream to return both values.
+        /// </summary>
+        public class ChatMessage
+        {
+            private int chatID;
+            private byte[] chatMsg;
+
+            public ChatMessage(int id, byte[] msg)
+            {
+                chatID = id;
+                chatMsg = msg;
+            }
+
+            // reads a raw message byte array containing the message and the chatID appended to the end
+            public ChatMessage(byte[] msg)
+            {
+                chatID = BitConverter.ToInt32(msg, msg.Length - 4);
+                chatMsg = new byte[msg.Length - 4];
+                Array.Copy(msg, chatMsg, msg.Length - 4);
+            }
+
+            // returns the chatID the message belongs to
+            public int getChatID()
+            {
+                return chatID;
+            }
+
+            // returns actual message
+            public byte[] getChatMessage()
+            {
+                return new byte[]{};
+            }
+
+            // returns bytes with chatID appended to the end
+            public byte[] toBytes()
+            {
+                byte[] msg = new byte[chatMsg.Length + 4];
+
+                Array.Copy(chatMsg, msg, chatMsg.Length);
+
+                byte[] id = BitConverter.GetBytes(chatID);
+                id.CopyTo(msg, chatMsg.Length - 1);
+
+                return msg;
+            }
+        }
+        
+        public class Chat
+        {
+            private int chatID;
+            private HashSet<TcpClient> chatMembers;
+
+            public Chat()                                                                                                 // Modify Constructor to generate "random" chatID
+            {
+                chatID = 0;
+                chatMembers = new HashSet<TcpClient>();
+            }
+
+            public void addMember(TcpClient newUser)
+            {
+                foreach(TcpClient member in chatMembers){
+
+                }
+                chatMembers.Add(newUser);
+            }
+
+            /// <summary>
+            /// For chat messages only
+            /// </summary>
+            /// <param name="message"></param>
+            public void message(String message)
+            {
+                foreach (TcpClient member in chatMembers)
+                {
+                    byte[] msg = encrypt(message);                                                                 // Frank - Encrypt Message here
+                    ChatMessage messg = new ChatMessage(chatID, msg);
+                    nModule.message(member, msgType.Chat, messg.toBytes());
+                }
+            }
+
+            /// <summary>
+            /// For verification only
+            /// </summary>
+            /// <param name="message"></param>
+            public void message(byte[] message)
+            {
+                foreach (TcpClient member in chatMembers)
+                {
+                    ChatMessage messg = new ChatMessage(chatID, message);
+                    nModule.message(member, msgType.Chat, messg.toBytes());
+                }
+            }
+        }
+
+
+        // Dummy Encryption
+        public static byte[] encrypt(String message)
+        {
+            return Encoding.ASCII.GetBytes(message);
         }
     }
+
 
     //#region OTRAdditions
 

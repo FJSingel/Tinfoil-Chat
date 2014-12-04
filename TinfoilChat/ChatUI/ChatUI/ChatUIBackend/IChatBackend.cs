@@ -45,5 +45,5 @@ namespace ChatUIBackend
         }
     }
 
-    public delegate void DisplyMessageDelegate(CompositeType data);
+    public delegate void DisplayMessageDelegate(CompositeType data);
 }

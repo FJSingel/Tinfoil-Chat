@@ -9,17 +9,23 @@ using System.Threading;
 
 namespace ChatSession
 {
+    enum msgType { Verification, Internal, Chat }
+
     public class NetworkModule
     {
+        public static NetworkModule networkModule;
+        private static Session cSess = Session.currentSession;
+
         bool isOnline;
         int portnum = 420;
 
-        TcpListener serverSocket;
-        HashSet<TcpClient> onlineClients;
-        HashSet<IPAddress> ignoreList;
+        TcpListener portListener;
+        HashSet<TcpClient> connectedUsers;
 
-        Thread portListener;
+        Thread listener;
         List<Thread> connections;
+
+        HashSet<IPAddress> ignoreList;
 
         public NetworkModule()
         {
@@ -34,30 +40,42 @@ namespace ChatSession
 
         private void initialize()
         {
+            if (networkModule == null)
+            {
+                networkModule = this;
+            }
+            else
+            {
+                throw new Exception("Attempting to create a second network module.");
+            }
+
             isOnline = true;
 
 #pragma warning disable 618     //ignores the deprecated TcpListener constructor warning
-            serverSocket = new TcpListener(portnum);
+            portListener = new TcpListener(portnum);
 #pragma warning restore 618
 
-            onlineClients = new HashSet<TcpClient>();
+            connectedUsers = new HashSet<TcpClient>();
+            ignoreList = new HashSet<IPAddress>();
             connections = new List<Thread>();
 
-            portListener = new Thread(() => waitForConnection(isOnline, serverSocket));
-            portListener.Start();
+            listener = new Thread(() => listenForConnection(isOnline, portListener));
+            listener.Start();
         }
 
         /// <summary>
         /// Is the thread listening on the default or otherwise specified socket for connections
         /// </summary>
-        private void waitForConnection(bool online, TcpListener waitingSocket)
+        /// <param name="online">Value passed to alert when the thread should close.</param>
+        /// <param name="pListener">TcpListener that waits for other clients to attempt to make a connection.</param>
+        private void listenForConnection(bool online, TcpListener pListener)
         {
 
-            waitingSocket.Start();
+            pListener.Start();
 
             while (online)
             {
-                TcpClient nextClient = waitingSocket.AcceptTcpClient();
+                TcpClient nextClient = pListener.AcceptTcpClient();
                 IPAddress nextClientIP = ((IPEndPoint)nextClient.Client.RemoteEndPoint).Address;
                 if (ignoreList.Contains(nextClientIP))
                 {
@@ -65,10 +83,10 @@ namespace ChatSession
                     continue;
                 }
                 addClient(nextClient);
-                Session.currentSession.newUser(nextClient);
+                cSess.signalNewUser(nextClient);
             }
 
-            waitingSocket.Stop();
+            pListener.Stop();
         }
 
         public TcpClient findUser(string ip)
@@ -99,7 +117,7 @@ namespace ChatSession
 
         private void addClient(TcpClient client)
         {
-            onlineClients.Add(client);
+            connectedUsers.Add(client);
             Thread cThread = new Thread(() => clientListener(isOnline, client));
             connections.Add(cThread);
             cThread.Start();
@@ -110,20 +128,21 @@ namespace ChatSession
         /// </summary>
         /// <param name="online">The isOnline boolean needed to shutdown threads</param>
         /// <param name="clSocket">Socket of Client</param>
-        /// <param name="messageQueue">Client number in online list, in order of added.</param>
         private void clientListener(bool online, TcpClient clSocket)
         {
             NetworkStream networkStream;
-            byte[] bytesFrom = new byte[clSocket.ReceiveBufferSize];
+            byte[] bytesReceived = new byte[clSocket.ReceiveBufferSize];
 
             while (online && clSocket.Connected)
             {
                 try
                 {
                     networkStream = clSocket.GetStream();
-                    networkStream.Read(bytesFrom, 0, clSocket.ReceiveBufferSize);
+                    networkStream.Read(bytesReceived, 0, clSocket.ReceiveBufferSize);
+
+                    //Find end of message (find first byte of size 0 in array)
                     int msgSize = 1;
-                    foreach (byte byt in bytesFrom)
+                    foreach (byte byt in bytesReceived)
                     {
                         if (byt == 0)
                         {
@@ -131,9 +150,33 @@ namespace ChatSession
                         }
                         msgSize++;
                     }
+
+                    //Shorten message to end of message
                     byte[] msgBytes = new byte[msgSize];
-                    Array.Copy(bytesFrom, msgBytes, msgSize);
-                    Session.currentSession.newMessage(msgBytes);
+                    Array.Copy(bytesReceived, msgBytes, msgSize);
+
+                    //Get message type off end of message
+                    msgType type = msgType.Internal;
+                    switch (msgBytes[msgSize - 1])
+                    {
+                        case 1:
+                            type = msgType.Verification;
+                            break;
+                        case 2:
+                            type = msgType.Internal;
+                            break;
+                        case 3:
+                            type = msgType.Chat;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    //Shorten message to actual message
+                    byte[] msg = new byte[msgSize - 1];
+                    Array.Copy(msgBytes, msg, msg.Length);
+
+                    cSess.signalNewMessage(type, msg);
                 }
                 catch (Exception ex)
                 {
@@ -143,48 +186,62 @@ namespace ChatSession
         }
 
         /// <summary>
+        /// Helper function to append a single byte to the end of an array of bytes
+        /// </summary>
+        /// <param name="array">The array of bytes for the byte to be appended to.</param>
+        /// <param name="thing">The byte to be appended to the array of bytes.</param>
+        /// <returns>Returns the new array with the specified byte appended to the end</returns>
+        private byte[] appendToEnd(byte[] array, byte thing)
+        {
+            int bytesOfmsg = array.Length + 1;
+            byte[] bytesToSend = new byte[bytesOfmsg];
+
+            array.CopyTo(bytesToSend, 0);
+            bytesToSend.SetValue(thing, array.Length);
+            return bytesToSend;
+        }
+
+        /// <summary>
         /// Writes message to network stream of specified client's socket
         /// </summary>
         /// <param name="client">TcpClient in online list.</param>
+        /// <param name="type">Type of Message to be sent</param>
         /// <param name="msg">Message to be sent</param>
-        public void message(TcpClient client, byte[] msg)
+        public void message(TcpClient client, msgType type, byte[] msg)
         {
+            switch (type)
+            {
+                case msgType.Verification:
+                    msg = appendToEnd(msg, 1);
+                    break;
+                case msgType.Internal:
+                    msg = appendToEnd(msg, 2);
+                    break;
+                case msgType.Chat:
+                    msg = appendToEnd(msg, 3);
+                    break;
+                default:
+                    break;
+            }
+
             Thread mThread = new Thread(() => messageThread(client, msg));
             mThread.Start();
         }
 
-        /// <summary>
-        /// Writes message to every connected clients' socket's network stream
-        /// </summary>
-        /// <param name="msg">Message to be sent</param>
-        public void broadcast(byte[] msg)
-        {
-            int bytesOfmsg = msg.Length + 1;
-            byte[] bytesToSend = new byte[bytesOfmsg];
-
-            msg.CopyTo(bytesToSend, 0);
-            Byte terminate = 0;
-            bytesToSend.SetValue(terminate, msg.Length);
-
-            foreach (TcpClient client in onlineClients)
-            {
-                Thread mThread = new Thread(() => messageThread(client, msg));
-                mThread.Start();
-            }
-        }
-
         private void messageThread(TcpClient client, byte[] msg)
         {
-            int bytesOfmsg = msg.Length + 1;
-            byte[] bytesToSend = new byte[bytesOfmsg];
-
-            msg.CopyTo(bytesToSend, 0);
-            Byte terminate = 0;
-            bytesToSend.SetValue(terminate, msg.Length);
+            msg = appendToEnd(msg, 0);
 
             NetworkStream networkStream = client.GetStream();
-            networkStream.Write(bytesToSend, 0, bytesOfmsg);
+            networkStream.Write(msg, 0, msg.Length);
             networkStream.Flush();
+        }
+
+        public void ignore(TcpClient client)
+        {
+            ignoreList.Add(((IPEndPoint)client.Client.RemoteEndPoint).Address);
+            connectedUsers.Remove(client);
+            client.Close();
         }
 
         public void close()
@@ -193,25 +250,18 @@ namespace ChatSession
 
             Thread.Sleep(500);
 
-            portListener.Abort();
-            serverSocket.Stop();
+            listener.Abort();
+            portListener.Stop();
 
             foreach (Thread thread in connections)
             {
                 thread.Abort();
             }
 
-            foreach (TcpClient client in onlineClients)
+            foreach (TcpClient client in connectedUsers)
             {
                 client.Close();
             }
-        }
-
-        public void ignore(TcpClient client)
-        {
-            ignoreList.Add(((IPEndPoint)client.Client.RemoteEndPoint).Address);
-            onlineClients.Remove(client);
-            client.Close();
         }
     }
 }
