@@ -39,13 +39,13 @@ public class Example
             Dictionary<TcpClient, Queue<byte[]>> thingy1 = client1.getOnlineClients();
             Dictionary<TcpClient, Queue<byte[]>> thingy2 = client2.getOnlineClients();
 
-            TcpClient tcpclient1 = thingy1.Keys.First();
-            TcpClient tcpclient2 = thingy2.Keys.First();
+            TcpClient tcpclient2 = thingy1.Keys.First();
+            TcpClient tcpclient1 = thingy2.Keys.First();
 
             Queue<byte[]> msgQueue1;
-            thingy1.TryGetValue(tcpclient1, out msgQueue1);
+            thingy1.TryGetValue(tcpclient2, out msgQueue1);
             Queue<byte[]> msgQueue2;
-            thingy2.TryGetValue(tcpclient2, out msgQueue2);
+            thingy2.TryGetValue(tcpclient1, out msgQueue2);
 
             Thread chatReader1 = new Thread(() => readQueue(msgQueue1, kill));
             Thread chatReader2 = new Thread(() => readQueue(msgQueue2, kill));
@@ -56,8 +56,9 @@ public class Example
             chatReader2.Start();
 
             Thread.Sleep(500);
-            client1.message(tcpclient1, msg);
+            client1.message(tcpclient2, msg);
             Thread.Sleep(500);
+            client2.message(tcpclient1, msg);
         }
 
         Console.ReadKey();

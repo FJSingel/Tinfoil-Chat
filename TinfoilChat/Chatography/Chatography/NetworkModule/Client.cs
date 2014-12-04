@@ -16,6 +16,7 @@ namespace Chatography.NetworkModule
 
         TcpListener serverSocket;
         Dictionary<TcpClient, Queue<byte[]>> onlineClients;
+        HashSet<IPAddress> ignoreList;
 
         Thread portListener;
         List<Thread> connections;
@@ -57,6 +58,12 @@ namespace Chatography.NetworkModule
             while (online)
             {
                 TcpClient nextClient = waitingSocket.AcceptTcpClient();
+                IPAddress nextClientIP = ((IPEndPoint)nextClient.Client.RemoteEndPoint).Address;
+                if (ignoreList.Contains(nextClientIP))
+                {
+                    nextClient.Close();
+                    continue;
+                }
                 addClient(nextClient);
             }
 
@@ -133,36 +140,6 @@ namespace Chatography.NetworkModule
             }
         }
 
-        private int indexOfSubArray(byte[] arrayToSearchIn, byte[] arrayToSearchFor)
-        {
-            int index = 0;
-            for (int i = 0; i < (arrayToSearchIn.Length - arrayToSearchFor.Length) + 1; i++)
-            {
-                index = i;
-                if (arrayToSearchIn[i] == arrayToSearchFor[0])
-                {
-                    bool completeMatch = true;
-                    for (int j = 1; j < arrayToSearchFor.Length; j++)
-                    {
-                        if (arrayToSearchIn[i+j] != arrayToSearchFor[j])
-                        {
-                            completeMatch = false;
-                            break;
-                        }
-                    }
-                    if (completeMatch)
-                    {
-                        break;
-                    }
-                }
-            }
-            if (arrayToSearchIn[index] != arrayToSearchFor[0])
-            {
-                return -1;
-            }
-            return index;
-        }
-
         /// <summary>
         /// Writes message to network stream of specified client's socket
         /// </summary>
@@ -180,6 +157,13 @@ namespace Chatography.NetworkModule
         /// <param name="msg">Message to be sent</param>
         public void broadcast(byte[] msg)
         {
+            int bytesOfmsg = msg.Length + 1;
+            byte[] bytesToSend = new byte[bytesOfmsg];
+
+            msg.CopyTo(bytesToSend, 0);
+            Byte terminate = 0;
+            bytesToSend.SetValue(terminate, msg.Length);
+
             foreach (TcpClient client in onlineClients.Keys)
             {
                 Thread mThread = new Thread(() => messageThread(client, msg));
@@ -223,7 +207,14 @@ namespace Chatography.NetworkModule
 
         public Dictionary<TcpClient, Queue<byte[]>> getOnlineClients()
         {
-            return onlineClients;
+            return new Dictionary<TcpClient, Queue<byte[]>>(onlineClients);
+        }
+
+        public void ignore(TcpClient client)
+        {
+            ignoreList.Add(((IPEndPoint)client.Client.RemoteEndPoint).Address);
+            onlineClients.Remove(client);
+            client.Close();
         }
     }
 }
