@@ -98,7 +98,7 @@ namespace ChatUI
                 try
                 {
                     this.DisplayMessage("You: " + textBoxEntryField.Text + Environment.NewLine);
-                    //_client.message(0, textBoxEntryField.Text);
+                    _client.message(0, textBoxEntryField.Text);
                     textBoxEntryField.Clear();
                 }
                 catch (Exception ex)

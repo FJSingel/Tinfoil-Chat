@@ -4,6 +4,7 @@
         Title="ChatWindow" Height="300" Width="350">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="15" />
             <RowDefinition Height="85*" />
             <RowDefinition Height="15*" />
         </Grid.RowDefinitions>
@@ -11,13 +12,22 @@
             <ColumnDefinition Width="200*" />
             <ColumnDefinition Width="100*" />
         </Grid.ColumnDefinitions>
-        <ScrollViewer>
-            <TextBox Height="Auto" HorizontalAlignment="Stretch" Name="textBoxChatPane" VerticalAlignment="Stretch" Width="Auto" Grid.Row="0" />
+        <Menu DockPanel.Dock="Top" Grid.ColumnSpan="2">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Add Friend" />
+                <MenuItem Header="_Invite Friend" />
+                <MenuItem Header="_New Chat"/>
+                <Separator />
+                <MenuItem Header="_Close" />
+            </MenuItem>
+        </Menu>
+        
+        <ScrollViewer Grid.Row="1">
+            <TextBox Height="Auto" HorizontalAlignment="Stretch" Name="textBoxChatPane" VerticalAlignment="Stretch" Width="Auto" Grid.Row="1" Grid.Column="0"/>
         </ScrollViewer>
-        <TextBox BorderThickness="1"  IsReadOnly="True" Height="192" HorizontalAlignment="Stretch" Margin="6,6,6,0" Name="UsersPane" VerticalAlignment="Top" Width="Auto" Grid.Row="0" Grid.Column="1" Text="Users:"/>
+        <TextBox BorderThickness="1"  IsReadOnly="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="6,6,6,0" Name="UsersPane" Width="Auto" Grid.Row="1" Grid.Column="1" Text="Users:"/>
 
-        <TextBox Height="Auto" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="textBoxEntryField" VerticalAlignment="Stretch" Width="Auto" Grid.Row="1" Grid.Column="0" KeyDown="textBoxEntryField_KeyDown" />
-        <Button Height="Auto" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="sendBtn" VerticalAlignment="Stretch" Width="Auto" Grid.Row="1" Grid.Column="1" Content="Send" />
-        <Button Content="Invite User" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="6,6,6,6" Grid.Column="1" Width="94"/>
+        <TextBox Height="Auto" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="textBoxEntryField" VerticalAlignment="Stretch" Width="Auto" Grid.Row="2" Grid.Column="0" KeyDown="textBoxEntryField_KeyDown" />
+        <Button Height="Auto" HorizontalAlignment="Stretch" Margin="6,6,6,6" Name="sendBtn" VerticalAlignment="Stretch" Width="Auto" Grid.Row="2" Grid.Column="1" Content="Send" />
     </Grid>
 </Window>
