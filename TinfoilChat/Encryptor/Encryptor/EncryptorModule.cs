@@ -26,8 +26,8 @@ namespace EncryptorModule
         OTRSessionManager BobSessionManager = null;
 
         const int NUMOFMSGS = 3;
-        String[] aliceMSGArray = new String[NUMOFMSGS];
-        String[] bobMSGArray = new String[NUMOFMSGS];
+        String[] aliceMSGArray = { "Hi.", "How are you?", "Bye!" };
+        String[] bobMSGArray = { "Hello.", "I am fine.", "Good bye!" };
 
         //Keeps track of which messages have already been sent
         int aliceConvPos = 0;
@@ -46,13 +46,13 @@ namespace EncryptorModule
             BobsFriendID = AliceID;
 
             //Let user designate some text to send
-            for (int x = 0; x < NUMOFMSGS; x++)
-            {
-                Console.WriteLine("Alice's input:");
-                aliceMSGArray[x] = Console.ReadLine();
-                Console.WriteLine("Bob's input:");
-                bobMSGArray[x] = Console.ReadLine();
-            }
+            //for (int x = 0; x < NUMOFMSGS; x++)
+            //{
+            //    Console.WriteLine("Alice's input:");
+            //    aliceMSGArray[x] = Console.ReadLine();
+            //    Console.WriteLine("Bob's input:");
+            //    bobMSGArray[x] = Console.ReadLine();
+            //}
 
             //Open Sessions for each user. IDs should be UNIQUE (Hashes?)
             AliceSessionManager = new OTRSessionManager(AliceID);
@@ -88,6 +88,7 @@ namespace EncryptorModule
              */
 
             AliceSessionManager.RequestOTRSession(AlicesFriendID, OTRSessionManager.GetSupportedOTRVersionList()[0]);
+            //AliceSessionManager.StartSMP(AlicesFriendID);
         }
 
         //Testing method
@@ -134,7 +135,7 @@ namespace EncryptorModule
                 case OTR_EVENT.READY:
                     Console.WriteLine("Alice: Encrypted OTR session with {0} established \n", e.GetSessionID());
                     aliceConvPos++;
-                    AliceSessionManager.EncryptMessage(AlicesFriendID, aliceMSGArray[aliceConvPos-1]);
+                    AliceSessionManager.EncryptMessage(AlicesFriendID, aliceMSGArray[aliceConvPos-1], true);
                     break;
                 case OTR_EVENT.DEBUG:
                     Console.WriteLine("Alice: " + e.GetMessage() + "\n");
@@ -173,8 +174,8 @@ namespace EncryptorModule
                     break;
                 case OTR_EVENT.READY:
                     Console.WriteLine("Bob: Encrypted OTR session with {0} established \n", e.GetSessionID());
-                    bobConvPos++;
-                    BobSessionManager.EncryptMessage(BobsFriendID, bobMSGArray[bobConvPos-1]);
+                    //bobConvPos++;
+                    //BobSessionManager.EncryptMessage(BobsFriendID, bobMSGArray[bobConvPos-1]);
                     break;
                 case OTR_EVENT.DEBUG:
                     Console.WriteLine("Bob: " + e.GetMessage() + "\n");
