@@ -37,9 +37,6 @@
     <ApplicationIcon>TFC.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto">
-      <HintPath>..\..\..\OTRLib\OTRLib\bin\Debug\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
