@@ -5,6 +5,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
+using OTR.Interface;
+
 namespace ChatSession
 {
     class Session
@@ -18,6 +20,9 @@ namespace ChatSession
 
         private Dictionary<int, Chat> verificationProcesses;
         private Dictionary<int, Chat> chats;
+        public static OTRSessionManager AliceOTRSession;
+        public static string AlicesFriendID = "Bob";
+        private string AlicesID;
 
         public Session()
         {
@@ -35,6 +40,10 @@ namespace ChatSession
             verifiedUsers = new HashSet<TcpClient>();
             unverifiedUsers = new HashSet<TcpClient>();
             chats = new Dictionary<int, Chat>();
+
+            AlicesID = "Alice";
+            AlicesFriendID = "Bob";
+            AliceOTRSession = new OTRSessionManager(AlicesID);
         }
 
         /// <summary>
@@ -50,6 +59,7 @@ namespace ChatSession
             verificationProcesses.Add(0, verificationProcess);
 
             verificationProcess.message(new byte[]{});                                                             // Frank some validation process begins here.
+
         }
 
         /// <summary>
@@ -59,6 +69,9 @@ namespace ChatSession
         public void signalNewUser(TcpClient newUser)
         {
             unverifiedUsers.Add(newUser);
+
+            //We need the foreign user's name
+            OpenOTRSession(AlicesFriendID);
         }
 
                                                                                                                     // FRAAAAAAANK FIIIITTZZZZZ Messages are processed here (all types in switch-case)
@@ -79,13 +92,13 @@ namespace ChatSession
             switch (type)
             {
                 case msgType.Verification:
-
+                    AliceOTRSession.ProcessOTRMessage(AlicesFriendID, msg.ToString());
                     break;
                 case msgType.Internal:
-
+                    AliceOTRSession.ProcessOTRMessage(AlicesFriendID, msg.ToString());
                     break;
                 case msgType.Chat:
-                                                                                                                    // FITZ Here's to you kid. Should signal some function in UI to output message.
+                    AliceOTRSession.ProcessOTRMessage(AlicesFriendID, msg.ToString());                                                                                                // FITZ Here's to you kid. Should signal some function in UI to output message.
                     break;
                 default:
                     break;
@@ -169,6 +182,8 @@ namespace ChatSession
             {
                 foreach (TcpClient member in chatMembers)
                 {
+                    AliceOTRSession.EncryptMessage(AlicesFriendID, message);
+                    
                     byte[] msg = encrypt(message);                                                                 // Frank - Encrypt Message here
                     ChatMessage messg = new ChatMessage(chatID, msg);
                     nModule.message(member, msgType.Chat, messg.toBytes());
@@ -195,73 +210,64 @@ namespace ChatSession
         {
             return Encoding.ASCII.GetBytes(message);
         }
+
+            #region otradditions
+
+        public void OpenOTRSession(string buddy_id)
+        {
+            /* create otr session and request otr session */
+    
+            AliceOTRSession.OnOTREvent += new OTREventHandler(OnAliceOTRMangerEventHandler);
+
+            AliceOTRSession.CreateOTRSession(buddy_id);
+
+            AliceOTRSession.RequestOTRSession(buddy_id, OTRSessionManager.GetSupportedOTRVersionList()[0]);
+
+        }
+
+        //todo: this manager needs to be updated to use the network traffic
+        private void OnAliceOTRMangerEventHandler(object source, OTREventArgs e)
+        {
+
+            switch (e.GetOTREvent())
+            {
+                case OTR_EVENT.MESSAGE:
+                    //this event happens when a message is decrypted successfully. Hand the message to the GUI
+                    Console.WriteLine("{0}: {1} \n", e.GetSessionID(), e.GetMessage());
+                    break;
+                case OTR_EVENT.SEND:
+                    //this is where you would send the data on the network. next line is just a dummy line. e.getmessage() will contain message to be sent
+                    //senddataonnetwork(aliceid, e.getmessage());
+
+                    break;
+                case OTR_EVENT.ERROR:
+                    //some sort of error occurred. we should use these errors to decide if it is fatal (failure to verify key) or benign (message did not decrypt)
+                    Console.WriteLine("alice: otr error: {0} \n", e.GetErrorMessage());
+                    Console.WriteLine("alice: otr error verbose: {0} \n", e.GetErrorVerbose());
+                    break;
+                case OTR_EVENT.READY:
+                    //fires when each user is ready for communication. can't communicate prior to this.
+                    Console.WriteLine("alice: encrypted otr session with {0} established \n", e.GetSessionID());
+                    AliceOTRSession.EncryptMessage(AlicesFriendID, "hi first message");
+                    break;
+                case OTR_EVENT.DEBUG:
+                    //just for debug lines. flagged using a true flag in the session manager construction
+                    Console.WriteLine("alice: " + e.GetMessage() + "\n");
+                    break;
+                case OTR_EVENT.EXTRA_KEY_REQUEST:
+                    //allow for symmetric aes key usage. only for otr v3+.
+                    //i doubt we need this.
+                    break;
+                case OTR_EVENT.SMP_MESSAGE:
+                    //fires after smp process finishes
+                    Console.WriteLine("alice: " + e.GetMessage() + "\n");
+                    break;
+                case OTR_EVENT.CLOSED:
+                    //fires when otr session closes
+                    Console.WriteLine("Alice: Encrypted OTR session with {0} closed \n", e.GetSessionID());
+                    break;
+            }
+        }
+        #endregion
     }
-
-
-    //#region OTRAdditions
-
-    //public void openOTRSession(String native_user_ID, String buddy_ID)
-    //{
-    //    /* Declare OTR variables*/
-    //    OTRSessionManager _alice_otr_session_manager = null;
-
-    //    string _my_unique_id = native_user_ID; //Something like "Alice"
-    //    string _my_buddy_unique_id = buddy_ID; //Something like "Bob"
-
-
-    //    /* Create OTR session and Request OTR session */
-    //    _alice_otr_session_manager = new OTRSessionManager(_my_unique_id);
-
-    //    _alice_otr_session_manager.OnOTREvent += new OTREventHandler(OnAliceOTRMangerEventHandler);
-
-    //    _alice_otr_session_manager.CreateOTRSession(_my_buddy_unique_id);
-
-    //    _alice_otr_session_manager.RequestOTRSession(_my_buddy_unique_id, OTRSessionManager.GetSupportedOTRVersionList()[0]);
-
-
-    //}
-
-    ////TODO: This manager needs to be updated to use the network traffic
-    //private void OnAliceOTRManagerEventHandler(object source, OTREventArgs e)
-    //{
-
-    //    switch (e.GetOTREvent())
-    //    {
-    //        case OTR_EVENT.MESSAGE:
-    //            //This event happens when a message is decrypted successfully
-    //            Console.WriteLine("{0}: {1} \n", e.GetSessionID(), e.GetMessage());
-    //            break;
-    //        case OTR_EVENT.SEND:
-    //            //This is where you would send the data on the network. Next line is just a dummy line. e.GetMessage() will contain message to be sent
-    //            SendDataOnNetwork(AliceID, e.GetMessage());
-    //            break;
-    //        case OTR_EVENT.ERROR:
-    //            //Some sort of error occurred. We should use these errors to decide if it is fatal (failure to verify key) or benign (message did not decrypt)
-    //            Console.WriteLine("Alice: OTR Error: {0} \n", e.GetErrorMessage());
-    //            Console.WriteLine("Alice: OTR Error Verbose: {0} \n", e.GetErrorVerbose());
-    //            break;
-    //        case OTR_EVENT.READY:
-    //            //Fires when each user is ready for communication. Can't communicate prior to this.
-    //            Console.WriteLine("Alice: Encrypted OTR session with {0} established \n", e.GetSessionID());
-    //            _alice_otr_session_manager.EncryptMessage(AlicesFriendID, "HI FIRST MESSAGE");
-    //            break;
-    //        case OTR_EVENT.DEBUG:
-    //            //Just for debug lines. Flagged using a true flag in the session manager construction
-    //            Console.WriteLine("Alice: " + e.GetMessage() + "\n");
-    //            break;
-    //        case OTR_EVENT.EXTRA_KEY_REQUEST:
-    //            //Allow for symmetric AES key usage. Only for OTR v3+.
-    //            //I doubt we need this.
-    //            break;
-    //        case OTR_EVENT.SMP_MESSAGE:
-    //            //Fires after SMP process finishes
-    //            Console.WriteLine("Alice: " + e.GetMessage() + "\n");
-    //            break;
-    //        case OTR_EVENT.CLOSED:
-    //            //Fires when OTR session closes
-    //            Console.WriteLine("Alice: Encrypted OTR session with {0} closed \n", e.GetSessionID());
-    //            break;
-    //    }
-    //}
-    //#endregion
 }
