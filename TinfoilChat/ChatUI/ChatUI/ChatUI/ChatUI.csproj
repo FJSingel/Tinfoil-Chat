@@ -139,6 +139,10 @@
     <Resource Include="TFC.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OTRLib\OTRLib\OTRLib.csproj">
+      <Project>{4d99ce35-7d85-4867-b953-c66d1f4ec67c}</Project>
+      <Name>OTRLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Chatography\Chatography\Chatography.csproj">
       <Project>{c5e907c2-58b9-4c8b-b2a3-6c40b37ab5ba}</Project>
       <Name>Chatography</Name>
