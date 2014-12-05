@@ -323,7 +323,8 @@ namespace Chatography
                     break;
                 case OTR_EVENT.CLOSED:
                     //Fires when OTR session closes
-                    Console.WriteLine("Alice: Encrypted OTR session with {0} closed \n", e.GetSessionID());
+                    cout.WriteLine("TFC_SYSTEM_MESSAGE: Encrypted OTR session with {0} closed \n", e.GetSessionID());
+                    cout.Flush();
                     break;
             }
         }
