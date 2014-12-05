@@ -238,7 +238,7 @@ namespace ChatSession
                 case OTR_EVENT.SEND:
                     //this is where you would send the data on the network. next line is just a dummy line. e.getmessage() will contain message to be sent
                     //senddataonnetwork(aliceid, e.getmessage());
-
+                    
                     break;
                 case OTR_EVENT.ERROR:
                     //some sort of error occurred. we should use these errors to decide if it is fatal (failure to verify key) or benign (message did not decrypt)

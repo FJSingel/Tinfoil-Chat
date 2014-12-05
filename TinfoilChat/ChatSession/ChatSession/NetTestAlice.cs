@@ -13,8 +13,9 @@ namespace ChatSession
             NetworkModule network = new NetworkModule();
             Session test = new Session();
             test.addUser("127.0.0.1");
-
             
+
+            Session.Chat.
         }
     }
 
