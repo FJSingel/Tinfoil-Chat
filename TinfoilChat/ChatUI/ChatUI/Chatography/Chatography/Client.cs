@@ -288,7 +288,7 @@ namespace Chatography
                 case OTR_EVENT.MESSAGE:
                     //This event happens when a message is decrypted successfully
                     //Console.WriteLine("{0}: {1} \n", e.GetSessionID(), e.GetMessage());
-                    cout.WriteLine("Client-" + e.GetSessionID() + ":" + e.GetMessage());
+                    cout.WriteLine("Client-" + e.GetSessionID() + ":\t" + e.GetMessage());
                     cout.Flush();
                     break;
                 case OTR_EVENT.SEND:
