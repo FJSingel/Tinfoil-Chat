@@ -96,7 +96,7 @@ namespace ChatUI
         {
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {
-                this.DisplayMessage("You:" + textBoxEntryField.Text + Environment.NewLine);
+                this.DisplayMessage("You:\t" + textBoxEntryField.Text + Environment.NewLine);
                 _client.encryptFromGUI(textBoxEntryField.Text + Environment.NewLine);
                 textBoxEntryField.Clear();
             }
