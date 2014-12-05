@@ -39,7 +39,7 @@
       <HintPath>..\..\OTRLib\OTRLib\bin\Debug\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="OTRLib">
-      <HintPath>..\..\OTRLib\OTRLib\bin\Debug\OTRLib.dll</HintPath>
+      <HintPath>..\..\..\..\OTRLib\OTRLib\bin\Debug\OTRLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
