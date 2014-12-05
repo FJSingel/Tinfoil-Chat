@@ -50,7 +50,9 @@ namespace ChatUI
             chatReader.Start();
 
             // Wait to connect with the seeking user
-            _client.findUser(this.guestIP, this.guestPort);
+            while(!_client.findUser(this.guestIP, this.guestPort)){
+                continue;
+            }
         }
 
         public void clientThread(MemoryStream readStream){
