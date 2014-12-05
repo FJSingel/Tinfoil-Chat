@@ -27,12 +27,13 @@ namespace ChatUI
     {
         //private ChatUIBackend.ChatBackend _backend;
 
-        private Session.Chat chat;
+        public Session.Chat chat {get; set;}
 
         public ChatWindow()
         {
             InitializeComponent();
             chat = new Session.Chat();
+
         }
 
         public ChatWindow(Session.Chat c){
@@ -56,13 +57,8 @@ namespace ChatUI
             }
         }
 
-        public void DisplayMessage(string message/*ChatUIBackend.CompositeType composite*/)
+        public void DisplayMessage(string message)
         {
-            /*
-            string username = composite.Username == null ? "" : composite.Username;
-            string message = composite.Message == null ? "" : composite.Message;
-            textBoxChatPane.Text += (username + ": " + message + Environment.NewLine);
-             */
             Dispatcher.BeginInvoke(DispatcherPriority.Input, new ThreadStart(() =>
             {
                 try
@@ -70,6 +66,22 @@ namespace ChatUI
                     textBoxChatPane.AppendText(message);
                 }
                 catch(Exception ex)
+                {
+                    System.Diagnostics.Debug.Write(ex.Message);
+                }
+            }));
+        }
+
+        public void DisplayMessage(Session.ChatMessage msg)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, new ThreadStart(() =>
+            {
+                try
+                {
+                    string strMsg = System.Text.Encoding.Default.GetString(msg.getChatMessage());
+                    textBoxChatPane.AppendText(strMsg);
+                }
+                catch (Exception ex)
                 {
                     System.Diagnostics.Debug.Write(ex.Message);
                 }
@@ -107,6 +119,27 @@ namespace ChatUI
         private void NewChat_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+    }
+
+    public class MessageListener
+    {
+        private Session session;
+        private ChatWindow window;
+
+        public MessageListener(Session sess, ChatWindow cWin)
+        {
+            window = cWin;
+            session = sess;
+            session.messageSent += new MessageSentHandler(MessageReceived);
+        }
+
+        private void MessageReceived(object sender, EventArgs e)
+        {
+            ChatSession.Session.ChatMessage msg = (ChatSession.Session.ChatMessage) e;
+            if(window.chat.chatID == msg.getChatID()){
+                window.DisplayMessage(msg);
+            }
         }
     }
 }

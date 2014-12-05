@@ -3,10 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
+
 
 namespace ChatSession
 {
+    // A delegate type for hooking up change notifications
+    public delegate void MessageSentHandler(object sender, EventArgs e);
+
     public class Session
     {
         public static Session currentSession;
@@ -18,6 +24,9 @@ namespace ChatSession
 
         private Dictionary<int, Chat> verificationProcesses;
         public Dictionary<int, Chat> chats;
+
+        // An event 
+        public event MessageSentHandler messageSent;
 
         public Session()
         {
@@ -90,19 +99,106 @@ namespace ChatSession
                     break;
                 case msgType.Chat:                                                                                   
                     // FITZ Here's to you kid. Should signal some function in UI to output message.
-
+                    messageSent(this, message);
                     break;
             }
         }
 
-        public Dictionary<int, Chat> getVerificationProcesses()
+        /// <summary>
+        /// This class is a container for a chatMessage and the chatID it belongs to.
+        /// It can return a byte array containing both information before sending to the stream.
+        /// It can also parse a byte array from that same stream to return both values.
+        /// </summary>
+        public class ChatMessage : EventArgs
         {
-            return verificationProcesses;
-        }
+            private int chatID;
+            private byte[] chatMsg;
 
-        public Dictionary<int, Chat> getChats()
+            public ChatMessage(int id, byte[] msg)
+            {
+                chatID = id;
+                chatMsg = msg;
+            }
+
+            // reads a raw message byte array containing the message and the chatID appended to the end
+            public ChatMessage(byte[] msg)
+            {
+                chatID = BitConverter.ToInt32(msg, msg.Length - 4);
+                chatMsg = new byte[msg.Length - 4];
+                Array.Copy(msg, chatMsg, msg.Length - 4);
+            }
+
+            // returns the chatID the message belongs to
+            public int getChatID()
+            {
+                return chatID;
+            }
+
+            // returns actual message
+            public byte[] getChatMessage()
+            {
+                return chatMsg;
+            }
+
+            // returns bytes with chatID appended to the end
+            public byte[] toBytes()
+            {
+                byte[] msg = new byte[chatMsg.Length + 4];
+
+                Array.Copy(chatMsg, msg, chatMsg.Length);
+
+                byte[] id = BitConverter.GetBytes(chatID);
+                id.CopyTo(msg, chatMsg.Length - 1);
+
+                return msg;
+            }
+        }
+        
+        public class Chat
         {
-            return chats;
+            public int chatID { get; set; }
+            private HashSet<TcpClient> chatMembers;
+
+            public Chat()    // Modify Constructor to generate "random" chatID
+            {
+                chatID = 0;
+                chatMembers = new HashSet<TcpClient>();
+            }
+
+            public void addMember(TcpClient newUser)
+            {
+                foreach(TcpClient member in chatMembers){
+                    chatMembers.Add(newUser);
+                }   
+            }
+
+            /// <summary>
+            /// For chat messages only
+            /// </summary>
+            /// <param name="message"></param>
+            public void message(String message)
+            {
+                foreach (TcpClient member in chatMembers)
+                {
+                    byte[] msg = encrypt(message);                                                                 
+                    // Frank - Encrypt Message here
+                    ChatMessage messg = new ChatMessage(chatID, msg);
+                    nModule.message(member, msgType.Chat, messg.toBytes());
+                }
+            }
+
+            /// <summary>
+            /// For verification only
+            /// </summary>
+            /// <param name="message"></param>
+            public void message(byte[] message)
+            {
+                foreach (TcpClient member in chatMembers)
+                {
+                    ChatMessage messg = new ChatMessage(chatID, message);
+                    nModule.message(member, msgType.Chat, messg.toBytes());
+                }
+            }
         }
 
 
