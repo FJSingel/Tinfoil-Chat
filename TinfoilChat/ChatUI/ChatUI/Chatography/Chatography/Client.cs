@@ -38,7 +38,7 @@ namespace Chatography
         private void initialize()
         {
             AlicesID = "Host";
-            AlicesFriendID = "Host";
+            AlicesFriendID = "Guest";
             isOnline = true;
             onlineClients = new List<TcpClient>();
             AliceSessionManager = new OTRSessionManager(AlicesID);
@@ -151,7 +151,7 @@ namespace Chatography
 
         private void messageThread(int clNo, string msg)
         {
-            byte[] bytesToSend = new byte[10025];
+            byte[] bytesToSend = new byte[1024];
             bytesToSend = Encoding.ASCII.GetBytes(msg + '$');
             int bytesOfmsg = Encoding.ASCII.GetByteCount(msg + '$');
 
@@ -271,12 +271,13 @@ namespace Chatography
                     break;
                 case OTR_EVENT.READY:
                     //Fires when each user is ready for communication. Can't communicate prior to this.
-                    Console.WriteLine("Alice: Encrypted OTR session with {0} established \n", e.GetSessionID());
+                    cout.WriteLine("Alice: Encrypted OTR session with {0} established \n", e.GetSessionID());
+                    cout.Flush();
                     AliceSessionManager.EncryptMessage(AlicesFriendID, "HI FIRST MESSAGE");
                     break;
                 case OTR_EVENT.DEBUG:
                     //Just for debug lines. Flagged using a true flag in the session manager construction
-                    cout.WriteLine("Alice: " + e.GetMessage() + "\n");
+                    cout.WriteLine("DEBUG: " + e.GetMessage() + "\n");
                     cout.Flush();
                     break;
                 case OTR_EVENT.EXTRA_KEY_REQUEST:
@@ -286,6 +287,7 @@ namespace Chatography
                 case OTR_EVENT.SMP_MESSAGE:
                     //Fires after SMP process finishes
                     cout.WriteLine("Authentication Notice: " + e.GetMessage() + "\n");
+                    cout.Flush();
                     break;
                 case OTR_EVENT.CLOSED:
                     //Fires when OTR session closes
