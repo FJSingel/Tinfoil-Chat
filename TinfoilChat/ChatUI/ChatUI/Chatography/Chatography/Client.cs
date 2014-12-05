@@ -128,8 +128,8 @@ namespace Chatography
                     dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf('$'));
                     AliceSessionManager.ProcessOTRMessage(AlicesFriendID, dataFromClient);
                     //cout.WriteLine("Client-" + clNo + ":" + dataFromClient);
-                    cout.WriteLine("Recieved:" + dataFromClient);
-                    cout.Flush();
+                    //cout.WriteLine("Recieved:" + dataFromClient); //Shouldn't need these two lines. These should be handled by ProcessOTRMEssage()
+                    //cout.Flush();
                 }
                 catch (Exception ex)
                 {
