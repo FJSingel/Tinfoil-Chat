@@ -288,7 +288,7 @@ namespace Chatography
                 case OTR_EVENT.MESSAGE:
                     //This event happens when a message is decrypted successfully
                     //Console.WriteLine("{0}: {1} \n", e.GetSessionID(), e.GetMessage());
-                    cout.WriteLine("Client-" + e.GetSessionID() + ":\t" + e.GetMessage());
+                    cout.Write("Client-" + e.GetSessionID() + ":\t" + e.GetMessage());
                     cout.Flush();
                     break;
                 case OTR_EVENT.SEND:
@@ -304,8 +304,9 @@ namespace Chatography
                 case OTR_EVENT.READY:
                     //Fires when each user is ready for communication. Can't communicate prior to this.
                     cout.WriteLine("TFC_SYSTEM_MESSAGE: Encrypted OTR session with {0} established \n", e.GetSessionID());
-                    cout.Flush();
+                    //cout.Flush();
                     AliceSessionManager.EncryptMessage(AlicesFriendID, "If you can read this, encryption is successful.");
+                    cout.Flush();
                     break;
                 case OTR_EVENT.DEBUG:
                     //Just for debug lines. Flagged using a true flag in the session manager construction
