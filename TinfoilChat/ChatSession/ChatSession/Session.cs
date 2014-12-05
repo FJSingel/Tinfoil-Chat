@@ -95,101 +95,14 @@ namespace ChatSession
             }
         }
 
-        /// <summary>
-        /// This class is a container for a chatMessage and the chatID it belongs to.
-        /// It can return a byte array containing both information before sending to the stream.
-        /// It can also parse a byte array from that same stream to return both values.
-        /// </summary>
-        public class ChatMessage
+        public Dictionary<int, Chat> getVerificationProcesses()
         {
-            private int chatID;
-            private byte[] chatMsg;
-
-            public ChatMessage(int id, byte[] msg)
-            {
-                chatID = id;
-                chatMsg = msg;
-            }
-
-            // reads a raw message byte array containing the message and the chatID appended to the end
-            public ChatMessage(byte[] msg)
-            {
-                chatID = BitConverter.ToInt32(msg, msg.Length - 4);
-                chatMsg = new byte[msg.Length - 4];
-                Array.Copy(msg, chatMsg, msg.Length - 4);
-            }
-
-            // returns the chatID the message belongs to
-            public int getChatID()
-            {
-                return chatID;
-            }
-
-            // returns actual message
-            public byte[] getChatMessage()
-            {
-                return chatMsg;
-            }
-
-            // returns bytes with chatID appended to the end
-            public byte[] toBytes()
-            {
-                byte[] msg = new byte[chatMsg.Length + 4];
-
-                Array.Copy(chatMsg, msg, chatMsg.Length);
-
-                byte[] id = BitConverter.GetBytes(chatID);
-                id.CopyTo(msg, chatMsg.Length - 1);
-
-                return msg;
-            }
+            return verificationProcesses;
         }
-        
-        public class Chat
+
+        public Dictionary<int, Chat> getChats()
         {
-            private int chatID;
-            private HashSet<TcpClient> chatMembers;
-
-            public Chat()    // Modify Constructor to generate "random" chatID
-            {
-                chatID = 0;
-                chatMembers = new HashSet<TcpClient>();
-            }
-
-            public void addMember(TcpClient newUser)
-            {
-                foreach(TcpClient member in chatMembers){
-                    chatMembers.Add(newUser);
-                }   
-            }
-
-            /// <summary>
-            /// For chat messages only
-            /// </summary>
-            /// <param name="message"></param>
-            public void message(String message)
-            {
-                foreach (TcpClient member in chatMembers)
-                {
-                    byte[] msg = encrypt(message);                                                                 
-                    // Frank - Encrypt Message here
-                    ChatMessage messg = new ChatMessage(chatID, msg);
-                    nModule.message(member, msgType.Chat, messg.toBytes());
-                }
-            }
-
-            /// <summary>
-            /// For verification only
-            /// </summary>
-            /// <param name="message"></param>
-            public void message(byte[] message)
-            {
-                foreach (TcpClient member in chatMembers)
-                {
-                    ChatMessage messg = new ChatMessage(chatID, message);
-                    nModule.message(member, msgType.Chat, messg.toBytes());
-                }
-            }
+            return chats;
         }
 
 
