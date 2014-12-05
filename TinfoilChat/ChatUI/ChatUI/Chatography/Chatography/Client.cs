@@ -106,7 +106,7 @@ namespace Chatography
             host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (IPAddress ip in host.AddressList)
             {
-                if (ip.AddressFamily.ToString() == "InterNetwork")
+                if (ip.AddressFamily.ToString() == "InterNetwork" && !(ip.ToString().Substring(0,3).Equals("192")))
                 {
                     localIP = ip.ToString();
                 }
