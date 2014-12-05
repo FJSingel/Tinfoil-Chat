@@ -50,7 +50,8 @@ namespace ChatUI
             chatReader.Start();
 
             // Wait to connect with the seeking user
-            _client.findUser(this.guestIP, this.guestPort);
+            //_client.findUser(this.guestIP, this.guestPort);
+            Console.Write(_client.findUser(this.guestIP, this.guestPort));
         }
 
         public void clientThread(MemoryStream readStream){
@@ -95,7 +96,8 @@ namespace ChatUI
             {
                 //_backend.SendMessage(textBoxEntryField.Text);
                 this.DisplayMessage(textBoxEntryField.Text);
-                _client.message(0, textBoxEntryField.Text);
+                _client.encryptFromGUI(textBoxEntryField.Text);
+                //_client.message(0, textBoxEntryField.Text);
                 textBoxEntryField.Clear();
             }
         }
