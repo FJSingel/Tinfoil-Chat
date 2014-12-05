@@ -77,18 +77,13 @@ namespace ChatUI
             }
         }
 
-        public void DisplayMessage(string message/*ChatUIBackend.CompositeType composite*/)
+        public void DisplayMessage(string message)
         {
-            /*
-            string username = composite.Username == null ? "" : composite.Username;
-            string message = composite.Message == null ? "" : composite.Message;
-            textBoxChatPane.Text += (username + ": " + message + Environment.NewLine);
-             */
             Dispatcher.BeginInvoke(DispatcherPriority.Input, new ThreadStart(() =>
             {
                 try
                 {
-                    textBoxChatPane.Text += (message + Environment.NewLine);
+                    textBoxChatPane.Text += (message);
                 }
                 catch(Exception ex)
                 {
@@ -101,10 +96,8 @@ namespace ChatUI
         {
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {
-                //_backend.SendMessage(textBoxEntryField.Text);
-                this.DisplayMessage(textBoxEntryField.Text);
+                this.DisplayMessage("You:" + textBoxEntryField.Text);
                 _client.encryptFromGUI(textBoxEntryField.Text);
-                //_client.message(0, textBoxEntryField.Text);
                 textBoxEntryField.Clear();
             }
         }

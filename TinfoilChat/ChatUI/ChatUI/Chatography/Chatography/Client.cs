@@ -99,7 +99,7 @@ namespace Chatography
             return true;
         }
 
-        private string getOwnIP()
+        public string getOwnIP()
         {
             IPHostEntry host;
             string localIP = "?";
@@ -309,8 +309,8 @@ namespace Chatography
                     break;
                 case OTR_EVENT.DEBUG:
                     //Just for debug lines. Flagged using a true flag in the session manager construction
-                    cout.WriteLine("DEBUG: " + e.GetMessage() + "\n");
-                    cout.Flush();
+                    //cout.WriteLine("DEBUG: " + e.GetMessage() + "\n");
+                    //cout.Flush();
                     break;
                 case OTR_EVENT.EXTRA_KEY_REQUEST:
                     //Allow for symmetric AES key usage. Only for OTR v3+.
