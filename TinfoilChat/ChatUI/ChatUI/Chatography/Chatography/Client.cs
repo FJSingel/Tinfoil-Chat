@@ -113,7 +113,7 @@ namespace Chatography
             }
             return localIP;*/
 
-            var request = (HttpWebRequest)WebRequest.Create("http://ifconfig.me");
+            var request = (HttpWebRequest)WebRequest.Create("http://ipconfig.me");
 
             request.UserAgent = "curl"; // this simulate curl linux command
 
