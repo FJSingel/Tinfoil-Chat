@@ -96,10 +96,20 @@ namespace ChatUI
         {
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {
-                this.DisplayMessage("You:" + textBoxEntryField.Text + Environment.NewLine);
-                _client.encryptFromGUI(textBoxEntryField.Text + Environment.NewLine);
-                textBoxEntryField.Clear();
+                sendMessage();
             }
+        }
+
+        private void sendBtn_Click(object sender, RoutedEventArgs e)
+        {
+            sendMessage();
+        }
+
+        private void sendMessage()
+        {   
+            this.DisplayMessage("You:\t" + textBoxEntryField.Text + Environment.NewLine);
+            _client.encryptFromGUI(textBoxEntryField.Text + Environment.NewLine);
+            textBoxEntryField.Clear();
         }
     }
 }
