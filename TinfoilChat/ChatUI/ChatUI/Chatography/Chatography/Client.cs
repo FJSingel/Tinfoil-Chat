@@ -127,7 +127,8 @@ namespace Chatography
                     dataFromClient = Encoding.ASCII.GetString(bytesFrom);
                     dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf('$'));
                     AliceSessionManager.ProcessOTRMessage(AlicesFriendID, dataFromClient);
-                    cout.WriteLine("Client-" + clNo + ":" + dataFromClient);
+                    //cout.WriteLine("Client-" + clNo + ":" + dataFromClient);
+                    cout.WriteLine("Recieved:" + dataFromClient);
                     cout.Flush();
                 }
                 catch (Exception ex)
@@ -275,7 +276,8 @@ namespace Chatography
                     break;
                 case OTR_EVENT.DEBUG:
                     //Just for debug lines. Flagged using a true flag in the session manager construction
-                    Console.WriteLine("Alice: " + e.GetMessage() + "\n");
+                    cout.WriteLine("Alice: " + e.GetMessage() + "\n");
+                    cout.Flush();
                     break;
                 case OTR_EVENT.EXTRA_KEY_REQUEST:
                     //Allow for symmetric AES key usage. Only for OTR v3+.
@@ -283,7 +285,7 @@ namespace Chatography
                     break;
                 case OTR_EVENT.SMP_MESSAGE:
                     //Fires after SMP process finishes
-                    Console.WriteLine("Alice: " + e.GetMessage() + "\n");
+                    cout.WriteLine("Authentication Notice: " + e.GetMessage() + "\n");
                     break;
                 case OTR_EVENT.CLOSED:
                     //Fires when OTR session closes
