@@ -36,10 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto">
-      <HintPath>..\..\OTRLib\OTRLib\bin\Debug\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
-    <Reference Include="OTRLib">
-      <HintPath>..\..\..\..\OTRLib\OTRLib\bin\Debug\OTRLib.dll</HintPath>
+      <HintPath>..\..\..\..\..\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -55,6 +52,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\OTRLib\OTRLib\OTRLib.csproj">
+      <Project>{4d99ce35-7d85-4867-b953-c66d1f4ec67c}</Project>
+      <Name>OTRLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
