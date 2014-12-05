@@ -101,7 +101,7 @@ namespace Chatography
 
         public string getOwnIP()
         {
-            IPHostEntry host;
+            /*IPHostEntry host;
             string localIP = "?";
             host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (IPAddress ip in host.AddressList)
@@ -111,7 +111,24 @@ namespace Chatography
                     localIP = ip.ToString();
                 }
             }
-            return localIP;
+            return localIP;*/
+
+            var request = (HttpWebRequest)WebRequest.Create("http://ifconfig.me");
+
+            request.UserAgent = "curl"; // this simulate curl linux command
+
+            string publicIPAddress;
+
+            request.Method = "GET";
+            using (WebResponse response = request.GetResponse())
+            {
+                using (var reader = new StreamReader(response.GetResponseStream()))
+                {
+                    publicIPAddress = reader.ReadToEnd();
+                }
+            }
+
+            return publicIPAddress.Replace("\n", "");
         }
 
         private void addClient(TcpClient client)
