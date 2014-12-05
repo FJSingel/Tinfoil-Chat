@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using ChatSession;
 
 namespace ChatUI
 {
@@ -19,9 +20,28 @@ namespace ChatUI
     /// </summary>
     public partial class HomePane : Window
     {
+        private Dictionary<int, ChatWindow> windows;
+        private Session sess; 
+
         public HomePane()
         {
             InitializeComponent();
+
+            // Initialize session data
+            sess = new Session();
+        }
+
+        private void NewChat_Click(object sender, RoutedEventArgs e)
+        {
+            launchNewChat();
+        }
+
+        public void launchNewChat()
+        {
+            ChatWindow cWindow = new ChatWindow();
+            int newChatId = cWindow.GetHashCode();
+            windows.Add(newChatId, cWindow);
+            cWindow.Show();
         }
     }
 }

@@ -15,8 +15,8 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
-using ChatUI.NetworkModule;
 using System.Windows.Threading;
+using ChatSession;
 
 namespace ChatUI
 {
@@ -27,32 +27,17 @@ namespace ChatUI
     {
         //private ChatUIBackend.ChatBackend _backend;
 
-        private Client _client;
-        private int port;
-        private string guestIP;
-        private int guestPort;
+        private Session.Chat chat;
 
-        public ChatWindow() : this("420", "0.0.0.0", "421"){}
-
-        public ChatWindow(string port, string guestIP, string guestPort)
+        public ChatWindow()
         {
-            // TODO: Complete member initialization
-            this.port = int.Parse(port);
-            this.guestIP = guestIP;
-            this.guestPort = int.Parse(guestPort);
-
             InitializeComponent();
-            //_backend = new ChatUIBackend.ChatBackend(this.DisplayMessage);
-            _client = new Client(this.port);
+            chat = new Session.Chat();
+        }
 
-            // Start a new thread to listen for interaction
-            /*Thread chatReader = new Thread(() => clientThread(_client.getChatStream()));
-            chatReader.Start();
-             * Dead Code
-             */
-
-            // Wait to connect with the seeking user
-            _client.findUser(this.guestIP, this.guestPort);
+        public ChatWindow(Session.Chat c){
+            InitializeComponent();
+            chat = c;
         }
 
         public void clientThread(MemoryStream readStream){
@@ -98,7 +83,7 @@ namespace ChatUI
                 try
                 {
                     this.DisplayMessage("You: " + textBoxEntryField.Text + Environment.NewLine);
-                    _client.message(0, textBoxEntryField.Text);
+                    this.chat.message(textBoxEntryField.Text);
                     textBoxEntryField.Clear();
                 }
                 catch (Exception ex)
@@ -107,6 +92,21 @@ namespace ChatUI
                 }
                 
             }
+        }
+
+        private void AddFriend_Click(object sender, RoutedEventArgs e)
+        {
+            // Chat to make a new user a friend
+        }
+
+        private void InviteUser_Click(object sender, RoutedEventArgs e)
+        {
+            // Invite an old friend to the chat
+        }
+
+        private void NewChat_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -14,9 +14,9 @@
         </Grid.ColumnDefinitions>
         <Menu DockPanel.Dock="Top" Grid.ColumnSpan="2">
             <MenuItem Header="_File">
-                <MenuItem Header="_Add Friend" />
-                <MenuItem Header="_Invite Friend" />
-                <MenuItem Header="_New Chat"/>
+                <MenuItem Header="_Add Friend" Click="AddFriend_Click"/>
+                <MenuItem Header="_Invite Friend" Click="InviteUser_Click"/>
+                <MenuItem Header="_New Chat" Click="NewChat_Click"/>
                 <Separator />
                 <MenuItem Header="_Close" />
             </MenuItem>

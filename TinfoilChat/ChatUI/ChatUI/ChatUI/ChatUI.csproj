@@ -38,9 +38,6 @@
     <ApplicationIcon>TFC.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ChatSession">
-      <HintPath>..\..\..\ChatSession\ChatSession\bin\Debug\ChatSession.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -77,7 +74,6 @@
     <Compile Include="HomePane.xaml.cs">
       <DependentUpon>HomePane.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NetworkModule\Client.cs" />
     <Compile Include="MainPane.xaml.cs">
       <DependentUpon>MainPane.xaml</DependentUpon>
     </Compile>
@@ -155,9 +151,9 @@
     <Resource Include="TFC.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ChatUIBackend\ChatUIBackend.csproj">
-      <Project>{ec33782e-3845-400a-850a-9db3b91ab977}</Project>
-      <Name>ChatUIBackend</Name>
+    <ProjectReference Include="..\..\..\ChatSession\ChatSession\ChatSession.csproj">
+      <Project>{b294e46d-181d-4254-bafc-93e6eb8061b9}</Project>
+      <Name>ChatSession</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

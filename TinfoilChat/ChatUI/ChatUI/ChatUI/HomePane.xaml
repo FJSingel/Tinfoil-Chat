@@ -12,12 +12,12 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="_Add Friend" />
-                <MenuItem Header="_New Chat" />
+                <MenuItem Header="_New Chat" Click="NewChat_Click"/>
                 <Separator />
                 <MenuItem Header="_Close" />
             </MenuItem>
         </Menu>
-        <DataGrid HorizontalAlignment="Stretch" Margin="6" VerticalAlignment="Stretch" Grid.Row="2" SelectionChanged="DataGrid_SelectionChanged">
+        <DataGrid HorizontalAlignment="Stretch" Margin="6" VerticalAlignment="Stretch" Grid.Row="2">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Alias" Binding="{Binding Alias}" Width="30*"/>
                 <DataGridTextColumn Header="IP" Binding="{Binding IP}" Width="20*"/>

@@ -48,7 +48,7 @@ namespace ChatUI
                 GuestIPEntryField.Text.Length > 0 &&
                 GuestPortEntryField.Text.Length > 0)
             {
-                ChatWindow chat = new ChatWindow(PortEntryField.Text, GuestIPEntryField.Text, GuestPortEntryField.Text);
+                ChatWindow chat = new ChatWindow();
                 this.Close();
                 chat.Show();
             }

@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 
 namespace ChatSession
 {
-    class Session
+    public class Session
     {
         public static Session currentSession;
 
-        private static NetworkModule nModule = NetworkModule.networkModule;
+        private static NetworkModule nModule;
 
         private HashSet<TcpClient> verifiedUsers;
         private HashSet<TcpClient> unverifiedUsers;
 
         private Dictionary<int, Chat> verificationProcesses;
-        private Dictionary<int, Chat> chats;
+        public Dictionary<int, Chat> chats;
 
         public Session()
         {
@@ -30,7 +30,7 @@ namespace ChatSession
                 throw new Exception("Attempting to create a second session.");
             }
 
-            NetworkModule.networkModule = new NetworkModule();
+            nModule = new NetworkModule();
 
             verifiedUsers = new HashSet<TcpClient>();
             unverifiedUsers = new HashSet<TcpClient>();
@@ -49,19 +49,23 @@ namespace ChatSession
             Chat verificationProcess = new Chat();
             verificationProcesses.Add(0, verificationProcess);
 
-            verificationProcess.message(new byte[]{});                                                             // Frank some validation process begins here.
+            verificationProcess.message(new byte[]{});                                                             
+            // Frank some validation process begins here.
         }
 
         /// <summary>
-        /// This is the signaled function that the NetworkModule calls when it receives a new connection (a new user initiates a connection to you).
+        /// This is the signaled function that the NetworkModule calls when it receives a new connection 
+        /// (a new user initiates a connection to you).
         /// </summary>
         /// <param name="newUser"></param>
         public void signalNewUser(TcpClient newUser)
         {
+            // TODO: Check to see if the user was already verified.
             unverifiedUsers.Add(newUser);
         }
 
-                                                                                                                    // FRAAAAAAANK FIIIITTZZZZZ Messages are processed here (all types in switch-case)
+                                                                                                                    
+        // FRAAAAAAANK FIIIITTZZZZZ Messages are processed here (all types in switch-case)
 
         /// <summary>
         /// This is the signaled function that the NetworkModule calls when it receives a message.
@@ -84,10 +88,9 @@ namespace ChatSession
                 case msgType.Internal:
 
                     break;
-                case msgType.Chat:
-                                                                                                                    // FITZ Here's to you kid. Should signal some function in UI to output message.
-                    break;
-                default:
+                case msgType.Chat:                                                                                   
+                    // FITZ Here's to you kid. Should signal some function in UI to output message.
+
                     break;
             }
         }
@@ -125,7 +128,7 @@ namespace ChatSession
             // returns actual message
             public byte[] getChatMessage()
             {
-                return new byte[]{};
+                return chatMsg;
             }
 
             // returns bytes with chatID appended to the end
@@ -147,7 +150,7 @@ namespace ChatSession
             private int chatID;
             private HashSet<TcpClient> chatMembers;
 
-            public Chat()                                                                                                 // Modify Constructor to generate "random" chatID
+            public Chat()    // Modify Constructor to generate "random" chatID
             {
                 chatID = 0;
                 chatMembers = new HashSet<TcpClient>();
@@ -156,9 +159,8 @@ namespace ChatSession
             public void addMember(TcpClient newUser)
             {
                 foreach(TcpClient member in chatMembers){
-
-                }
-                chatMembers.Add(newUser);
+                    chatMembers.Add(newUser);
+                }   
             }
 
             /// <summary>
@@ -169,7 +171,8 @@ namespace ChatSession
             {
                 foreach (TcpClient member in chatMembers)
                 {
-                    byte[] msg = encrypt(message);                                                                 // Frank - Encrypt Message here
+                    byte[] msg = encrypt(message);                                                                 
+                    // Frank - Encrypt Message here
                     ChatMessage messg = new ChatMessage(chatID, msg);
                     nModule.message(member, msgType.Chat, messg.toBytes());
                 }

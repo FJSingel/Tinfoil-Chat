@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace ChatSession
 {
-    enum msgType { Verification, Internal, Chat }
+    public enum msgType { Verification, Internal, Chat }
 
     public class NetworkModule
     {

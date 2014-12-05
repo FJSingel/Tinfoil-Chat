@@ -13,9 +13,8 @@ namespace ChatUIBackend
     {
         #region Receiving Messages
 
-        DisplyMessageDelegate _displayMessageDelegate = null;
+        DisplayMessageDelegate _displayMessageDelegate = null;
 
-        /// <summary>
         /// The default constructore is only here for testing
         /// </summary>
 
@@ -26,7 +25,7 @@ namespace ChatUIBackend
         /// of displaying messages
         /// </summary>
 
-        public ChatBackend(DisplyMessageDelegate dmd)
+        public ChatBackend(DisplayMessageDelegate dmd)
         {
             _displayMessageDelegate = dmd;
             StartService();
