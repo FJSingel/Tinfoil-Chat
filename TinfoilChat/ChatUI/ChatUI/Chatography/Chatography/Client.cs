@@ -303,9 +303,9 @@ namespace Chatography
                     break;
                 case OTR_EVENT.READY:
                     //Fires when each user is ready for communication. Can't communicate prior to this.
-                    cout.WriteLine("Alice: Encrypted OTR session with {0} established \n", e.GetSessionID());
+                    cout.WriteLine("TFC_SYSTEM_MESSAGE: Encrypted OTR session with {0} established \n", e.GetSessionID());
                     cout.Flush();
-                    AliceSessionManager.EncryptMessage(AlicesFriendID, "HI FIRST MESSAGE");
+                    AliceSessionManager.EncryptMessage(AlicesFriendID, "If you can read this, encryption is successful.");
                     break;
                 case OTR_EVENT.DEBUG:
                     //Just for debug lines. Flagged using a true flag in the session manager construction
