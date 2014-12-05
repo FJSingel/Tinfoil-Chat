@@ -271,7 +271,8 @@ namespace Chatography
 
             AliceSessionManager.OnOTREvent += new OTREventHandler(OnAliceOTRManagerEventHandler);
 
-            AliceSessionManager.CreateOTRSession(_my_buddy_unique_id, true);
+            //AliceSessionManager.CreateOTRSession(_my_buddy_unique_id, true);
+            AliceSessionManager.CreateOTRSession(_my_buddy_unique_id);
 
             AliceSessionManager.RequestOTRSession(_my_buddy_unique_id, OTRSessionManager.GetSupportedOTRVersionList()[0]);
 

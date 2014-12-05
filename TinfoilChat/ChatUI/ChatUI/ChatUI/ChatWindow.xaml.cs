@@ -59,13 +59,20 @@ namespace ChatUI
             int position = 0;
             while (true)
             {
-                readStream.Position = position;
-                string message = messageReader.ReadToEnd();
-                if (message.Length != 0)
+                try
                 {
-                    position += message.Length; 
-                    this.DisplayMessage(message);
-                    Console.Write(message);
+                    readStream.Position = position;
+                    string message = messageReader.ReadToEnd();
+                    if (message.Length != 0)
+                    {
+                        position += message.Length; 
+                        this.DisplayMessage(message);
+                        Console.Write(message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.Write(ex.Message);
                 }
             }
         }
