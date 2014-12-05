@@ -256,6 +256,11 @@ namespace Chatography
 
         #region OTRAdditions
 
+        public void encryptFromGUI(String input)
+        {
+            AliceSessionManager.EncryptMessage(AlicesFriendID, input);
+        }
+
         public void openOTRSession(String buddy_ID)
         {
             string _my_buddy_unique_id = buddy_ID; //Something like "Bob"
