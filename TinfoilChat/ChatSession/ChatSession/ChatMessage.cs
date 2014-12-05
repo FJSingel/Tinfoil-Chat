@@ -11,7 +11,7 @@ namespace ChatSession
     /// It can return a byte array containing both information before sending to the stream.
     /// It can also parse a byte array from that same stream to return both values.
     /// </summary>
-    public class ChatMessage
+    public class ChatMessage : EventArgs
     {
         private int chatID;
         private byte[] chatMsg;

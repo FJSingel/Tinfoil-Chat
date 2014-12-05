@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace ChatSession
 {
-
     public class Chat
     {
-        private int chatID;
+        public int chatID { get; set; }
         private HashSet<TcpClient> chatMembers;
 
         public Chat()    // Modify Constructor to generate "random" chatID
@@ -28,7 +27,7 @@ namespace ChatSession
         }
 
         /// <summary>
-        /// For verification only
+        /// 
         /// </summary>
         /// <param name="message"></param>
         public void message(byte[] message)
