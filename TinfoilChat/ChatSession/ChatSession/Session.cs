@@ -3,10 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
+
 
 namespace ChatSession
 {
+    // A delegate type for hooking up change notifications
+    public delegate void MessageSentHandler(object sender, EventArgs e);
+
     public class Session
     {
         public static Session currentSession;
@@ -18,6 +24,9 @@ namespace ChatSession
 
         private Dictionary<int, Chat> verificationProcesses;
         public Dictionary<int, Chat> chats;
+
+        // An event 
+        public event MessageSentHandler messageSent;
 
         public Session()
         {
@@ -90,7 +99,7 @@ namespace ChatSession
                     break;
                 case msgType.Chat:                                                                                   
                     // FITZ Here's to you kid. Should signal some function in UI to output message.
-
+                    messageSent(this, message);
                     break;
             }
         }
@@ -100,7 +109,7 @@ namespace ChatSession
         /// It can return a byte array containing both information before sending to the stream.
         /// It can also parse a byte array from that same stream to return both values.
         /// </summary>
-        public class ChatMessage
+        public class ChatMessage : EventArgs
         {
             private int chatID;
             private byte[] chatMsg;
@@ -147,7 +156,7 @@ namespace ChatSession
         
         public class Chat
         {
-            private int chatID;
+            public int chatID { get; set; }
             private HashSet<TcpClient> chatMembers;
 
             public Chat()    // Modify Constructor to generate "random" chatID
