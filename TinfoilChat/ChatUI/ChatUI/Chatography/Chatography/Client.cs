@@ -266,8 +266,9 @@ namespace Chatography
                     break;
                 case OTR_EVENT.ERROR:
                     //Some sort of error occurred. We should use these errors to decide if it is fatal (failure to verify key) or benign (message did not decrypt)
-                    Console.WriteLine("Alice: OTR Error: {0} \n", e.GetErrorMessage());
-                    Console.WriteLine("Alice: OTR Error Verbose: {0} \n", e.GetErrorVerbose());
+                    cout.WriteLine("Alice: OTR Error: {0} \n", e.GetErrorMessage());
+                    cout.WriteLine("Alice: OTR Error Verbose: {0} \n", e.GetErrorVerbose());
+                    cout.Flush();
                     break;
                 case OTR_EVENT.READY:
                     //Fires when each user is ready for communication. Can't communicate prior to this.
