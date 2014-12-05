@@ -37,7 +37,7 @@ namespace Chatography
 
         private void initialize()
         {
-            AlicesID = "Host";
+            AlicesID = getOwnIP();
             AlicesFriendID = "Guest";
             isOnline = true;
             onlineClients = new List<TcpClient>();
@@ -76,6 +76,7 @@ namespace Chatography
         /// <returns>True if user is found otherwise false.</returns>
         public bool findUser(string ip, int port)
         {
+            AlicesFriendID = ip;
             try
             {
                 IPAddress.Parse(ip);
@@ -98,9 +99,33 @@ namespace Chatography
             return true;
         }
 
+        private string getOwnIP()
+        {
+            IPHostEntry host;
+            string localIP = "?";
+            host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress ip in host.AddressList)
+            {
+                if (ip.AddressFamily.ToString() == "InterNetwork")
+                {
+                    localIP = ip.ToString();
+                }
+            }
+            return localIP;
+        }
+
         private void addClient(TcpClient client)
         {/////////////////////////////////////
-            openOTRSession(AlicesFriendID);
+            //openOTRSession(AlicesFriendID);
+            
+            AliceSessionManager.OnOTREvent += new OTREventHandler(OnAliceOTRManagerEventHandler);
+
+            AliceSessionManager.CreateOTRSession(AlicesFriendID, true);
+
+            //Person with higher/lower IP is host.
+            if(AlicesFriendID.CompareTo(AlicesID)<0){
+                AliceSessionManager.RequestOTRSession(AlicesFriendID, OTRSessionManager.GetSupportedOTRVersionList()[0]);
+            }
             onlineClients.Add(client);
             Thread cThread = new Thread(() => clientListener(client, onlineClients.Count - 1));
             cout.WriteLine("Client-" + (onlineClients.Count - 1) + " online!");
