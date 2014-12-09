@@ -38,6 +38,9 @@
     <ApplicationIcon>TFC.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>..\..\..\..\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -151,9 +154,23 @@
     <Resource Include="TFC.ico" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <ProjectReference Include="..\..\..\ChatSession\ChatSession\ChatSession.csproj">
       <Project>{b294e46d-181d-4254-bafc-93e6eb8061b9}</Project>
       <Name>ChatSession</Name>
+=======
+    <ProjectReference Include="..\..\..\OTRLib\OTRLib\OTRLib.csproj">
+      <Project>{4d99ce35-7d85-4867-b953-c66d1f4ec67c}</Project>
+      <Name>OTRLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Chatography\Chatography\Chatography.csproj">
+      <Project>{c5e907c2-58b9-4c8b-b2a3-6c40b37ab5ba}</Project>
+      <Name>Chatography</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ChatUIBackend\ChatUIBackend.csproj">
+      <Project>{ec33782e-3845-400a-850a-9db3b91ab977}</Project>
+      <Name>ChatUIBackend</Name>
+>>>>>>> origin/LetsWorkOnThis
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

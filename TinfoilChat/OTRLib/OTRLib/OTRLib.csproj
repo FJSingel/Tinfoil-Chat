@@ -32,7 +32,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto">
+<<<<<<< HEAD
       <HintPath>lib\BouncyCastle.Crypto.dll</HintPath>
+=======
+      <HintPath>..\..\..\BouncyCastle.Crypto.dll</HintPath>
+>>>>>>> origin/LetsWorkOnThis
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

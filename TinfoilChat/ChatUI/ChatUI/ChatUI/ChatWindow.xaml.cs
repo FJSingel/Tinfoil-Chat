@@ -36,9 +36,15 @@ namespace ChatUI
 
         }
 
+<<<<<<< HEAD
         public ChatWindow(Session.Chat c){
             InitializeComponent();
             chat = c;
+=======
+            // Wait to connect with the seeking user
+            //_client.findUser(this.guestIP, this.guestPort);
+            Console.Write(_client.findUser(this.guestIP, this.guestPort));
+>>>>>>> origin/LetsWorkOnThis
         }
 
         public void clientThread(MemoryStream readStream){
@@ -46,13 +52,20 @@ namespace ChatUI
             int position = 0;
             while (true)
             {
-                readStream.Position = position;
-                string message = messageReader.ReadToEnd();
-                if (message.Length != 0)
+                try
                 {
-                    position += message.Length; 
-                    this.DisplayMessage(message);
-                    Console.Write(message);
+                    readStream.Position = position;
+                    string message = messageReader.ReadToEnd();
+                    if (message.Length != 0)
+                    {
+                        position += message.Length; 
+                        this.DisplayMessage(message);
+                        Console.Write(message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.Write(ex.Message);
                 }
             }
         }
@@ -63,7 +76,11 @@ namespace ChatUI
             {
                 try
                 {
+<<<<<<< HEAD
                     textBoxChatPane.AppendText(message);
+=======
+                    textBoxChatPane.Text += (message);
+>>>>>>> origin/LetsWorkOnThis
                 }
                 catch(Exception ex)
                 {
@@ -92,6 +109,7 @@ namespace ChatUI
         {
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {
+<<<<<<< HEAD
                 try
                 {
                     this.DisplayMessage("You: " + textBoxEntryField.Text + Environment.NewLine);
@@ -139,7 +157,22 @@ namespace ChatUI
             ChatSession.Session.ChatMessage msg = (ChatSession.Session.ChatMessage) e;
             if(window.chat.chatID == msg.getChatID()){
                 window.DisplayMessage(msg);
+=======
+                sendMessage();
+>>>>>>> origin/LetsWorkOnThis
             }
+        }
+
+        private void sendBtn_Click(object sender, RoutedEventArgs e)
+        {
+            sendMessage();
+        }
+
+        private void sendMessage()
+        {   
+            this.DisplayMessage("You:\t" + textBoxEntryField.Text + Environment.NewLine);
+            _client.encryptFromGUI(textBoxEntryField.Text + Environment.NewLine);
+            textBoxEntryField.Clear();
         }
     }
 }

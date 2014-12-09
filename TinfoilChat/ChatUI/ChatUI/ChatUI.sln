@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatUI", "ChatUI\ChatUI.csproj", "{6C66ED76-393B-4CCB-A4A4-50CAEFB39FF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatUIBackend", "ChatUIBackend\ChatUIBackend.csproj", "{EC33782E-3845-400A-850A-9DB3B91AB977}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatSession", "..\..\ChatSession\ChatSession\ChatSession.csproj", "{B294E46D-181D-4254-BAFC-93E6EB8061B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTRLib", "..\..\OTRLib\OTRLib\OTRLib.csproj", "{4D99CE35-7D85-4867-B953-C66D1F4EC67C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +25,21 @@ Global
 		{EC33782E-3845-400A-850A-9DB3B91AB977}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC33782E-3845-400A-850A-9DB3B91AB977}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC33782E-3845-400A-850A-9DB3B91AB977}.Release|Any CPU.Build.0 = Release|Any CPU
+<<<<<<< HEAD
 		{B294E46D-181D-4254-BAFC-93E6EB8061B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B294E46D-181D-4254-BAFC-93E6EB8061B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B294E46D-181D-4254-BAFC-93E6EB8061B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B294E46D-181D-4254-BAFC-93E6EB8061B9}.Release|Any CPU.Build.0 = Release|Any CPU
+=======
+		{C5E907C2-58B9-4C8B-B2A3-6C40B37AB5BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5E907C2-58B9-4C8B-B2A3-6C40B37AB5BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5E907C2-58B9-4C8B-B2A3-6C40B37AB5BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5E907C2-58B9-4C8B-B2A3-6C40B37AB5BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D99CE35-7D85-4867-B953-C66D1F4EC67C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D99CE35-7D85-4867-B953-C66D1F4EC67C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D99CE35-7D85-4867-B953-C66D1F4EC67C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D99CE35-7D85-4867-B953-C66D1F4EC67C}.Release|Any CPU.Build.0 = Release|Any CPU
+>>>>>>> origin/LetsWorkOnThis
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

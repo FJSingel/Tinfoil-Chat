@@ -54,7 +54,7 @@ namespace ChatUI
             }
             else
             {
-                MessageBox.Show("Your chat is not setup yet. Plesae complete all fields", "Chat Setup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Your chat is not setup yet. Please complete all fields", "Chat Setup Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

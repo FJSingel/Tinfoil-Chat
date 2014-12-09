@@ -35,6 +35,12 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+<<<<<<< HEAD:TinfoilChat/ChatSession/ChatSession/ChatSession.csproj
+=======
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>..\..\..\..\..\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+>>>>>>> origin/LetsWorkOnThis:TinfoilChat/ChatUI/ChatUI/Chatography/Chatography/Chatography.csproj
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows" />
@@ -54,6 +60,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\OTRLib\OTRLib\OTRLib.csproj">
+      <Project>{4d99ce35-7d85-4867-b953-c66d1f4ec67c}</Project>
+      <Name>OTRLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
